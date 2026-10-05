@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 2 Economy).
+ * CivilCraft — entry point (Phase 3 Government).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -26,14 +26,18 @@ import { getRecentTransactions } from "./economy/transactions.js";
 import { getBalance, formatMoney } from "./economy/wallet.js";
 import { getPriceSnapshot } from "./economy/prices.js";
 import { CURRENCY_SYMBOL } from "./economy/economy-data.js";
+import { initializeGovernment, formatGovernmentLines, getGovernmentSnapshot } from "./government/government-manager.js";
+import { appoint, getGovernment } from "./government/leadership.js";
+import { createProject } from "./government/public-spending.js";
 
-Logger.info("CivilCraft Phase 2 loading…");
+Logger.info("CivilCraft Phase 3 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
 initializeJobs();
 initializeSchedules();
 initializeEconomy();
+initializeGovernment();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -77,6 +81,9 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           );
           player.sendMessage(
             "§6Economy:§r economy money prices goods shops transactions"
+          );
+          player.sendMessage(
+            "§6Government:§r government leader treasury taxes budget departments approval govtransactions"
           );
           break;
 
@@ -198,6 +205,98 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           break;
         }
 
+        case "government":
+        case "approval": {
+          for (const line of formatGovernmentLines()) player.sendMessage(line);
+          break;
+        }
+
+        case "leader": {
+          const snap = getGovernmentSnapshot();
+          if (!snap.ready) {
+            player.sendMessage("§cNo government");
+            break;
+          }
+          const gov = getGovernment();
+          const first = getAllVillagers()[0];
+          if (args[1] === "appoint" && args[2] && first) {
+            const role = args[2];
+            const result = appoint(role, first.id);
+            player.sendMessage(result.ok ? `§aAppointed ${first.name} as ${role}` : `§c${result.error}`);
+            break;
+          }
+          player.sendMessage(`Mayor: ${snap.mayor}`);
+          player.sendMessage("§7Use !cc leader appoint mayor|deputy_mayor|treasurer");
+          if (gov?.leadership) {
+            player.sendMessage(`Deputy: ${gov.leadership.deputy_mayor?.villagerId || "vacant"}`);
+            player.sendMessage(`Treasurer: ${gov.leadership.treasurer?.villagerId || "vacant"}`);
+          }
+          break;
+        }
+
+        case "treasury": {
+          const snap = getGovernmentSnapshot();
+          player.sendMessage(
+            snap.ready
+              ? `§aTreasury ${snap.treasury}${CURRENCY_SYMBOL}  in collected ${snap.collected}  spent ${snap.spent}`
+              : "§cNo treasury"
+          );
+          break;
+        }
+
+        case "taxes": {
+          const gov = getGovernment();
+          if (!gov) {
+            player.sendMessage("§cNo government");
+            break;
+          }
+          if (args[1] && !Number.isNaN(Number(args[1]))) {
+            const rate = Math.max(0, Math.min(50, Math.floor(Number(args[1]))));
+            gov.taxPolicy.ratePercent = rate;
+            player.sendMessage(`§aTax rate set to ${rate}%`);
+            break;
+          }
+          player.sendMessage(
+            `Rate ${gov.taxPolicy.ratePercent}%  threshold ${gov.taxPolicy.threshold}  max ${gov.taxPolicy.maxTax}  collected ${gov.taxCollected}`
+          );
+          break;
+        }
+
+        case "budget": {
+          const snap = getGovernmentSnapshot();
+          if (!snap.ready) break;
+          player.sendMessage(
+            `PW ${snap.budget.public_works}  Admin ${snap.budget.administration}  Reserve ${snap.budget.reserve}`
+          );
+          if (args[1] === "project") {
+            const result = createProject({ type: "maintenance", cost: 20, name: "Road maintenance" });
+            player.sendMessage(result.ok ? `§aFunded ${result.project.id}` : `§c${result.error}`);
+          }
+          break;
+        }
+
+        case "departments": {
+          const snap = getGovernmentSnapshot();
+          if (!snap.ready) break;
+          for (const d of snap.departments) {
+            player.sendMessage(`${d.enabled ? "§a" : "§7"}${d.name}§r head:${d.head || "none"}`);
+          }
+          break;
+        }
+
+        case "govtransactions": {
+          const snap = getGovernmentSnapshot();
+          const txs = snap.transactions || [];
+          if (txs.length === 0) {
+            player.sendMessage("§7No government transactions");
+            break;
+          }
+          for (const t of txs) {
+            player.sendMessage(`§7${t.type}§r ${t.amount}${CURRENCY_SYMBOL} ${t.reason}`);
+          }
+          break;
+        }
+
         default:
           player.sendMessage("§cUnknown command. Try !cc help");
       }
@@ -210,4 +309,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 2 ready.");
+Logger.info("CivilCraft Phase 3 ready.");

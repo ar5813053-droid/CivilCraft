@@ -50,6 +50,7 @@ export function payOwnerDividends(threshold = 300, share = 20) {
     // Shop uses money accessor
     const result = transferMoney(shop, owner, payout, TxType.SALARY, "shop_dividend");
     if (result.ok) {
+      owner.taxableIncome = (owner.taxableIncome || 0) + payout;
       Logger.debug(
         `Dividend ${payout}₡: ${shop.name} → ${owner.name}`
       );

@@ -154,3 +154,36 @@ World dynamic property key: `civilcraft:world_data`
 - `system.runInterval`
 - Entity spawn/load events
 - Optional `chatSend` for debug commands
+
+
+## Government (Phase 3)
+
+```
+Earned income (production / dividends)
+    → taxableIncome on villager
+    → collectIncomeTax (interval)
+        → villager wallet debit
+        → treasury credit
+        → taxableIncome cleared (no double tax)
+Treasury free balance
+    → budget allocation (public works / administration / reserve)
+Public works project
+    → spendFromBudget
+    → treasury debit
+    → project record (funded → completed)
+```
+
+Approval:
+
+```
+approval = clamp(
+  60
+  + wealth modifier
+  + food modifier
+  - tax rate modifier
+  - unemployment modifier
+  + spending modifier,
+  0, 100)
+```
+
+Government records live in `worldData.government.governments` keyed by id so later nations can coexist. Only `municipal` is active. World data version is 3. `normalizeGovernmentStore()` repairs missing or corrupt fields.

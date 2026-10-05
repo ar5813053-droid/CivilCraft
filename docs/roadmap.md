@@ -29,12 +29,21 @@
 
 ---
 
-## Phase 3 — Government
+## Phase 3 — Government ✅
 
-- Village / town leadership roles
-- Basic tax collection
-- Public works budget
-- Claim / territory markers
+- Persistent municipal government record (regional/national are type extension points)
+- Leadership seats: mayor, deputy mayor, treasurer, department head
+- Departments: Finance and Public Works active; Health, Education, Public Safety reserved
+- Treasury separate from villager wallets
+- Income tax on newly earned income only (threshold, rate, max tax)
+- Budget categories: public works, administration, reserve
+- Public works project records funded only from treasury
+- Approval metric from economy, tax, unemployment, spending, food
+- Government debug commands
+
+**Out of scope for Phase 3:** elections, parties, laws, police, courts, military, diplomacy, multi-nation behavior.
+
+---
 
 ## Phase 4 — Laws & Justice
 

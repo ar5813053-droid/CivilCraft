@@ -35,6 +35,7 @@ import { DEFAULT_JOB_ID } from "../core/constants.js";
  * @property {number} lastUpdated
  * @property {string|null} entityId  // last known runtime entity id (not durable)
  * @property {Record<string, number>} inventory  // economic goods (Phase 2)
+ * @property {number} taxableIncome              // earned since last tax collection
  * @property {boolean} [_economySeeded]
  */
 
@@ -63,6 +64,7 @@ export function createVillagerRecord(overrides = {}) {
     lastUpdated: overrides.lastUpdated ?? now,
     entityId: overrides.entityId ?? null,
     inventory: overrides.inventory ?? {},
+    taxableIncome: overrides.taxableIncome ?? 0,
     _economySeeded: overrides._economySeeded ?? false
   };
 }

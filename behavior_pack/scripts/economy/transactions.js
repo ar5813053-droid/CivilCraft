@@ -25,7 +25,10 @@ export const TxType = Object.freeze({
   TRADE: "trade",
   TRANSFER: "transfer",
   CONSUMPTION: "consumption",
-  RESTOCK: "restock"
+  RESTOCK: "restock",
+  TAX: "tax",
+  GOVERNMENT_EXPENSE: "government_expense",
+  BUDGET_TRANSFER: "budget_transfer"
 });
 
 /**
@@ -108,6 +111,11 @@ export function transferMoney(from, to, amount, type, reason) {
 export function grantIncome(to, amount, type, reason) {
   const cre = credit(to, amount);
   if (!cre.ok) return { ok: false, error: cre.error };
+
+  // Income tax base. Starting seeds use setBalance and do not pass through here.
+  if (to && cre.credited > 0) {
+    to.taxableIncome = sanitizeMoney((to.taxableIncome || 0) + cre.credited);
+  }
 
   const record = makeRecord({
     type: type || TxType.PRODUCTION_INCOME,

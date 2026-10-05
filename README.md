@@ -4,8 +4,8 @@
 
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
-> **Current status:** Phase 2 — Economy  
-> Version: `1.1.0`  
+> **Current status:** Phase 3 — Government  
+> Version: `1.2.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -36,7 +36,24 @@ CivilCraft turns vanilla villagers into persistent citizens with identities, job
 | Transactions | ✅ | Validated ledger (capped history) |
 | Village stats | ✅ | Total money, production, consumption, employment |
 
-**Not implemented yet:** government, taxes, laws, police, courts, military, politics, multi-nation diplomacy.
+**Not implemented yet:** elections, parties, laws, police, courts, military, diplomacy.
+
+## Phase 3 Features (Government)
+
+| System | Status | Notes |
+|--------|--------|-------|
+| Government record | ✅ | Municipal active; regional/national are type hooks |
+| Leadership | ✅ | Mayor, deputy mayor, treasurer, department head |
+| Departments | ✅ | Finance + Public Works active; Health, Education, Public Safety reserved |
+| Treasury | ✅ | Separate balance; no negative funds |
+| Income tax | ✅ | Threshold, rate, max tax; taxes new income once |
+| Budget | ✅ | Public works, administration, reserve |
+| Public works | ✅ | Data projects (road, building, maintenance) |
+| Approval | ✅ | Economy, tax, unemployment, spending, food |
+| Debug commands | ✅ | `!cc government`, `leader`, `treasury`, `taxes`, `budget`, `departments`, `approval`, `govtransactions` |
+
+**Not implemented yet:** elections, parties, laws, police, courts, military, diplomacy.
+
 
 ---
 
@@ -72,6 +89,14 @@ When `DEBUG` is `true` and `chatSend` is available:
 | `!cc goods` | Registered goods |
 | `!cc shops` | Shop list and balances |
 | `!cc transactions` | Recent ledger entries |
+| `!cc government` | Government overview |
+| `!cc leader` | Leadership; `!cc leader appoint mayor` |
+| `!cc treasury` | Treasury balance |
+| `!cc taxes` | Policy; `!cc taxes 12` sets rate |
+| `!cc budget` | Allocations; `!cc budget project` funds maintenance |
+| `!cc departments` | Department list |
+| `!cc approval` | Approval metric |
+| `!cc govtransactions` | Treasury ledger |
 
 ---
 
@@ -126,7 +151,7 @@ See [docs/architecture.md](docs/architecture.md) and [docs/roadmap.md](docs/road
 
 1. Living Village ✅  
 2. Economy ✅  
-3. Government  
+3. Government ✅  
 4. Laws & Justice  
 5. Police & Emergency  
 6. Healthcare & Education  
@@ -145,6 +170,7 @@ See [docs/architecture.md](docs/architecture.md) and [docs/roadmap.md](docs/road
 node tests/validate-structure.js
 node tests/economy/wallet.test.js
 node tests/economy/prices.test.js
+node tests/government/government.test.js
 ```
 
 Static/structure tests only — in-game behavior requires a Bedrock client.
