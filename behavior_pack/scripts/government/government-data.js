@@ -107,7 +107,9 @@ export function createDefaultGovernment(id = "municipal_main") {
       public_works: 0,
       administration: 0,
       reserve: 0,
-      public_safety: 0
+      public_safety: 0,
+      healthcare: 0,
+      education: 0
     },
     projects: [],
     approval: 60,
@@ -218,7 +220,9 @@ export function normalizeGovernment(id, gov) {
       public_works: clampMoney(gov.budget?.public_works),
       administration: clampMoney(gov.budget?.administration),
       reserve: clampMoney(gov.budget?.reserve),
-      public_safety: clampMoney(gov.budget?.public_safety)
+      public_safety: clampMoney(gov.budget?.public_safety),
+      healthcare: clampMoney(gov.budget?.healthcare),
+      education: clampMoney(gov.budget?.education)
     },
     projects: Array.isArray(gov.projects) ? gov.projects.slice(-MAX_PROJECTS) : [],
     approval: clampMoney(gov.approval ?? 60) > 100 ? 100 : clampMoney(gov.approval ?? 60),

@@ -8,6 +8,8 @@ import { registerWorkerJob } from "./jobs/worker.js";
 import { registerTraderJob } from "./jobs/trader.js";
 import { registerBuilderJob } from "./jobs/builder.js";
 import { registerPoliceJob } from "./jobs/police-officer.js";
+import { registerHealerJob, registerNurseJob, registerDoctorJob } from "./jobs/medical.js";
+import { registerTeacherJob } from "./jobs/teacher.js";
 import { Logger } from "../core/logger.js";
 
 /**
@@ -20,6 +22,10 @@ export function initializeJobs() {
   registerTraderJob();
   registerBuilderJob();
   registerPoliceJob();
+  registerHealerJob();
+  registerNurseJob();
+  registerDoctorJob();
+  registerTeacherJob();
   Logger.info("Job registry initialized (Phase 1 jobs).");
 }
 

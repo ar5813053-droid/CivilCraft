@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 5 Police & Emergency).
+ * CivilCraft — entry point (Phase 6 Healthcare & Education).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -44,8 +44,15 @@ import { hireOfficer, getOfficerByVillager } from "./police/officers.js";
 import { setRank, getAllRanks } from "./police/ranks.js";
 import { reportCrime } from "./police/arrests.js";
 import { initializeEmergency, formatEmergencyLines, getEmergencyStore, createEmergency } from "./emergency/emergency-manager.js";
+import { initializeHealthcare, formatHealthLines, getHealthcare } from "./healthcare/healthcare-manager.js";
+import { setHealth } from "./healthcare/health-records.js";
+import { treatVillager } from "./healthcare/treatments.js";
+import { createClinic } from "./healthcare/clinics.js";
+import { initializeEducation, formatEducationLines, getEducation } from "./education/education-manager.js";
+import { enrollStudent, graduate } from "./education/students.js";
+import { createSchool } from "./education/schools.js";
 
-Logger.info("CivilCraft Phase 5 loading…");
+Logger.info("CivilCraft Phase 6 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -56,6 +63,8 @@ initializeGovernment();
 initializeJustice();
 initializePolice();
 initializeEmergency();
+initializeHealthcare();
+initializeEducation();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -448,6 +457,84 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           break;
         }
 
+        case "health":
+        case "healthcare":
+        case "medical": {
+          if (args[1] === "set") {
+            const result = setHealth(getHealthcare(), args[2], Number(args[3]));
+            player.sendMessage(result.ok ? `§aHealth ${result.record.health}` : `§c${result.error}`);
+            break;
+          }
+          if (args[1] === "treat") {
+            const result = treatVillager(getHealthcare(), { villagerId: args[2], conditionId: "minor_illness" });
+            player.sendMessage(result.ok ? "§aTreated" : `§c${result.error}`);
+            break;
+          }
+          for (const line of formatHealthLines()) player.sendMessage(line);
+          break;
+        }
+
+        case "patient": {
+          const record = getHealthcare().records.find((r) => r.villagerId === args[1]);
+          player.sendMessage(record ? `${record.health} ${record.status}` : "§cNo record");
+          break;
+        }
+
+        case "clinics":
+          player.sendMessage(getHealthcare().clinics.map((c) => c.name).join(", ") || "§7None");
+          break;
+
+        case "clinic": {
+          if (args[1] === "create") {
+            const result = createClinic(getHealthcare(), args.slice(2).join(" ") || "Clinic");
+            player.sendMessage(result.ok ? `§a${result.clinic.clinicId}` : `§c${result.error}`);
+          }
+          break;
+        }
+
+        case "education": {
+          if (args[1] === "enroll") {
+            const result = enrollStudent(getEducation(), args[2]);
+            player.sendMessage(result.ok ? "§aEnrolled" : `§c${result.error}`);
+            break;
+          }
+          if (args[1] === "graduate") {
+            const record = getEducation().records.find((r) => r.villagerId === args[2]);
+            if (record) record.graduationProgress = 100;
+            const result = graduate(record);
+            player.sendMessage(result.ok ? `§a${result.record.educationLevel}` : `§c${result.error || "missing"}`);
+            break;
+          }
+          for (const line of formatEducationLines()) player.sendMessage(line);
+          break;
+        }
+
+        case "student": {
+          const record = getEducation().records.find((r) => r.villagerId === args[1]);
+          player.sendMessage(record ? `${record.educationLevel} progress ${record.graduationProgress}` : "§cNo student");
+          break;
+        }
+
+        case "schools":
+          player.sendMessage(getEducation().schools.map((s) => s.name).join(", ") || "§7None");
+          break;
+
+        case "school": {
+          if (args[1] === "create") {
+            const result = createSchool(getEducation(), args.slice(2).join(" ") || "School");
+            player.sendMessage(result.ok ? `§a${result.school.schoolId}` : `§c${result.error}`);
+          }
+          break;
+        }
+
+        case "teachers":
+          player.sendMessage(String(getEducation().teachers.length));
+          break;
+
+        case "classes":
+          player.sendMessage(getEducation().classes.map((c) => c.subject).join(", ") || "§7None");
+          break;
+
         default:
           player.sendMessage("§cUnknown command. Try !cc help");
       }
@@ -460,4 +547,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 5 ready.");
+Logger.info("CivilCraft Phase 6 ready.");

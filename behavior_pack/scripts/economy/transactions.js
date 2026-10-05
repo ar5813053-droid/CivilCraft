@@ -32,7 +32,11 @@ export const TxType = Object.freeze({
   LEGAL_FINE: "legal_fine",
   GOVERNMENT_SALARY: "government_salary",
   POLICE_EXPENSE: "police_expense",
-  EMERGENCY_EXPENSE: "emergency_expense"
+  EMERGENCY_EXPENSE: "emergency_expense",
+  MEDICAL_EXPENSE: "medical_expense",
+  GOVERNMENT_HEALTHCARE: "government_healthcare_expense",
+  EDUCATION_EXPENSE: "education_expense",
+  GOVERNMENT_EDUCATION: "government_education_expense"
 });
 
 /**

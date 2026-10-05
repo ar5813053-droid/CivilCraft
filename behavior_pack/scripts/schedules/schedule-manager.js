@@ -14,6 +14,7 @@ import { getJob } from "../jobs/job-registry.js";
 import { patchVillager } from "../villagers/villager-registry.js";
 import { DEFAULT_SCHEDULE, resolveActivity } from "./default-schedule.js";
 import { POLICE_SCHEDULE } from "./police-schedule.js";
+import { CLINIC_SCHEDULE, SCHOOL_SCHEDULE } from "./service-schedules.js";
 
 /** @type {Map<string, ScheduleEntry[]>} */
 const scheduleTemplates = new Map();
@@ -50,6 +51,8 @@ export function getSchedule(id) {
 export function initializeSchedules() {
   registerSchedule("default", DEFAULT_SCHEDULE);
   registerSchedule("police", POLICE_SCHEDULE);
+  registerSchedule("clinic", CLINIC_SCHEDULE);
+  registerSchedule("school", SCHOOL_SCHEDULE);
   Logger.info("Schedule templates initialized.");
 }
 

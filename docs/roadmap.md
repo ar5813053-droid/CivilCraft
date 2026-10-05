@@ -85,7 +85,16 @@
 - Fire & disaster response stubs
 - Emergency gathering points
 
-## Phase 6 — Healthcare & Education
+## Phase 6 — Healthcare & Education ✅
+
+- Health records, clinics, treatments
+- Healer, nurse, doctor, teacher jobs
+- Schools, classes, graduation
+- Treasury-backed public services
+
+---
+
+## Phase 6 notes
 
 - Healer / doctor job
 - Injury & disease states

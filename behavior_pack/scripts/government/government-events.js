@@ -24,8 +24,10 @@ export function computeApproval(input) {
   const taxMod = Math.round(taxRate * 0.4);
   const unempMod = Math.round(unemployment * 25);
   const spendMod = Math.max(0, Math.min(10, Math.round(spending * 8)));
+  const healthMod = Math.max(-5, Math.min(5, Math.round(((input.healthcareQuality ?? 50) - 50) / 10)));
+  const eduMod = Math.max(-5, Math.min(5, Math.round(((input.educationQuality ?? 50) - 50) / 10)));
 
-  const raw = 60 + economic + foodMod - taxMod - unempMod + spendMod;
+  const raw = 60 + economic + foodMod - taxMod - unempMod + spendMod + healthMod + eduMod;
   return Math.max(0, Math.min(100, raw));
 }
 

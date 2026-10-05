@@ -4,8 +4,8 @@
 
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
-> **Current status:** Phase 5 — Police & Emergency  
-> Version: `1.4.0`  
+> **Current status:** Phase 6 — Healthcare & Education  
+> Version: `1.5.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -184,7 +184,7 @@ See [docs/architecture.md](docs/architecture.md) and [docs/roadmap.md](docs/road
 3. Government ✅  
 4. Laws & Justice ✅  
 5. Police & Emergency ✅  
-6. Healthcare & Education  
+6. Healthcare & Education ✅  
 7. Cities & Infrastructure  
 8. Military  
 9. Politics & Elections  
@@ -204,6 +204,8 @@ node tests/government/government.test.js
 node tests/justice/justice.test.js
 node tests/police/police.test.js
 node tests/emergency/emergency.test.js
+node tests/healthcare/healthcare.test.js
+node tests/education/education.test.js
 ```
 
 Static/structure tests only — in-game behavior requires a Bedrock client.
@@ -219,3 +221,7 @@ Repository: https://github.com/ar5813053-droid/CivilCraft
 ## Phase 5 Features (Police & Emergency)
 
 Police officers, ranks, station records, lightweight patrols, justice-backed crime reports, arrest records, treasury-funded salaries, and emergency dispatch. No prisons, pathfinding, or automatic crime scans.
+
+## Phase 6 Features (Healthcare & Education)
+
+Health records, clinics, treatments billed through wallets, medical emergency hook, schools, teachers, classes, and bounded skill bonuses. No physical buildings or per-tick simulation.

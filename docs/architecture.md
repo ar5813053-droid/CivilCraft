@@ -208,3 +208,7 @@ Public Safety department remains disabled. Tax evasion is a law definition only;
 ## Police & Emergency (Phase 5)
 
 Public Safety is enabled on municipal_main. Officers reference villager ids. reportCrime calls justice.reportViolation. Salaries use transferMoney type government_salary and fail into unpaidSalaries if the treasury is short. Patrols and dispatch are interval records, not pathfinding. World data version is 5.
+
+## Healthcare & Education (Phase 6)
+
+Records are keyed by villagerId. Treatment uses medical_expense or a treasury subsidy. Unpaid bills stay outstanding. Medical emergencies stay queued without staff. Education progress runs on a 50-second interval. Skill bonuses are computed, not written into job definitions. Approval accepts optional healthcareQuality and educationQuality, each capped at ±5. World data version is 6.
