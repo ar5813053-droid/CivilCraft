@@ -117,7 +117,10 @@ export function createProject(spec, govId) {
     budgetCategory: BudgetCategory.PUBLIC_WORKS,
     status: "funded",
     createdAt: Date.now(),
-    completedAt: null
+    completedAt: null,
+    settlementId: spec.settlementId || "settlement_main",
+    infrastructureId: spec.infrastructureId || null,
+    applied: false
   };
   gov.projects.push(project);
   if (gov.projects.length > MAX_PROJECTS) {

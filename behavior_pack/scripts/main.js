@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 6 Healthcare & Education).
+ * CivilCraft — entry point (Phase 7 Cities & Infrastructure).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -51,8 +51,11 @@ import { createClinic } from "./healthcare/clinics.js";
 import { initializeEducation, formatEducationLines, getEducation } from "./education/education-manager.js";
 import { enrollStudent, graduate } from "./education/students.js";
 import { createSchool } from "./education/schools.js";
+import { initializeSettlements, formatSettlementLines, getSettlement, getSettlementStore, evaluateGrowth } from "./settlements/settlement-manager.js";
+import { typeForPopulation } from "./settlements/settlement-types.js";
+import { initializeInfrastructure, formatInfraLines, getInfrastructure } from "./infrastructure/infrastructure-manager.js";
 
-Logger.info("CivilCraft Phase 6 loading…");
+Logger.info("CivilCraft Phase 7 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -65,6 +68,8 @@ initializePolice();
 initializeEmergency();
 initializeHealthcare();
 initializeEducation();
+initializeSettlements();
+initializeInfrastructure();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -535,6 +540,45 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           player.sendMessage(getEducation().classes.map((c) => c.subject).join(", ") || "§7None");
           break;
 
+        case "settlements":
+        case "settlement":
+        case "city": {
+          if (args[1] === "info" || args[1] === "stats") {
+            const lines = formatSettlementLines(args[2] || "settlement_main");
+            for (const line of lines) player.sendMessage(line);
+            break;
+          }
+          if (args[1] === "upgrade") {
+            const settlement = getSettlement(args[2] || "settlement_main");
+            if (!settlement) {
+              player.sendMessage("§cNo settlement");
+              break;
+            }
+            settlement.population = args[2] === "metro" ? 1000 : settlement.population + 100;
+            settlement.type = typeForPopulation(settlement.population, settlement.type);
+            player.sendMessage(`§a${settlement.type}`);
+            break;
+          }
+          for (const line of formatSettlementLines(args[1] && args[1] !== "settlement" ? args[1] : "settlement_main")) {
+            player.sendMessage(line);
+          }
+          break;
+        }
+
+        case "infrastructure": {
+          if (args[1] === "info") {
+            const record = getInfrastructure().records.find((r) => r.id === args[2]);
+            player.sendMessage(record ? `${record.type} cap ${record.capacity}` : "§cNo infrastructure");
+            break;
+          }
+          for (const line of formatInfraLines()) player.sendMessage(line);
+          break;
+        }
+
+        case "roads":
+          player.sendMessage(getInfrastructure().roads.map((r) => r.id).join(", ") || "§7None");
+          break;
+
         default:
           player.sendMessage("§cUnknown command. Try !cc help");
       }
@@ -547,4 +591,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 6 ready.");
+Logger.info("CivilCraft Phase 7 ready.");

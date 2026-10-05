@@ -4,8 +4,8 @@
 
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
-> **Current status:** Phase 6 — Healthcare & Education  
-> Version: `1.5.0`  
+> **Current status:** Phase 7 — Cities & Infrastructure  
+> Version: `1.6.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -185,7 +185,7 @@ See [docs/architecture.md](docs/architecture.md) and [docs/roadmap.md](docs/road
 4. Laws & Justice ✅  
 5. Police & Emergency ✅  
 6. Healthcare & Education ✅  
-7. Cities & Infrastructure  
+7. Cities & Infrastructure ✅  
 8. Military  
 9. Politics & Elections  
 10. Multiple Nations & Diplomacy  
@@ -206,6 +206,7 @@ node tests/police/police.test.js
 node tests/emergency/emergency.test.js
 node tests/healthcare/healthcare.test.js
 node tests/education/education.test.js
+node tests/settlements/settlements.test.js
 ```
 
 Static/structure tests only — in-game behavior requires a Bedrock client.
@@ -225,3 +226,7 @@ Police officers, ranks, station records, lightweight patrols, justice-backed cri
 ## Phase 6 Features (Healthcare & Education)
 
 Health records, clinics, treatments billed through wallets, medical emergency hook, schools, teachers, classes, and bounded skill bonuses. No physical buildings or per-tick simulation.
+
+## Phase 7 Features (Cities & Infrastructure)
+
+Settlements progress village → town → city → metro without downgrades. Infrastructure and roads are data bindings. Existing clinic, school, and station records are referenced, not copied. No procedural city generation.

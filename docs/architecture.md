@@ -212,3 +212,7 @@ Public Safety is enabled on municipal_main. Officers reference villager ids. rep
 ## Healthcare & Education (Phase 6)
 
 Records are keyed by villagerId. Treatment uses medical_expense or a treasury subsidy. Unpaid bills stay outstanding. Medical emergencies stay queued without staff. Education progress runs on a 50-second interval. Skill bonuses are computed, not written into job definitions. Approval accepts optional healthcareQuality and educationQuality, each capped at ±5. World data version is 6.
+
+## Settlements & Infrastructure (Phase 7)
+
+`settlement_main` is created once from the existing village. Type thresholds are configurable and never downgrade. Prosperity moves 25% toward the new score each evaluation. Infrastructure records may have null locations. Public works can set infrastructureId and improve condition when completed. World data version is 7. Stats run about every 60 seconds.

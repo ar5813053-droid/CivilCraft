@@ -29,10 +29,12 @@ import { safeJsonParse } from "./utils.js";
  * @property {object|null} emergency             // Phase 5 emergency
  * @property {object|null} healthcare            // Phase 6 healthcare
  * @property {object|null} education             // Phase 6 education
+ * @property {object|null} settlements           // Phase 7 settlements
+ * @property {object|null} infrastructure        // Phase 7 infrastructure
  */
 
 const DEFAULT_WORLD_DATA = () => ({
-  version: 6,
+  version: 7,
   villagers: {},
   households: {},
   villages: {},
@@ -43,7 +45,9 @@ const DEFAULT_WORLD_DATA = () => ({
   police: null,
   emergency: null,
   healthcare: null,
-  education: null
+  education: null,
+  settlements: null,
+  infrastructure: null
 });
 
 let cache = null;
@@ -62,7 +66,7 @@ export function loadWorldData() {
       const parsed = safeJsonParse(raw, null);
       if (parsed && typeof parsed === "object" && parsed.version) {
         cache = {
-          version: parsed.version ?? 6,
+          version: parsed.version ?? 7,
           villagers: parsed.villagers ?? {},
           households: parsed.households ?? {},
           villages: parsed.villages ?? {},
@@ -75,7 +79,9 @@ export function loadWorldData() {
           police: parsed.police ?? null,
           emergency: parsed.emergency ?? null,
           healthcare: parsed.healthcare ?? null,
-          education: parsed.education ?? null
+          education: parsed.education ?? null,
+          settlements: parsed.settlements ?? null,
+          infrastructure: parsed.infrastructure ?? null
         };
         Logger.debug("World data loaded from dynamic property.");
         return cache;

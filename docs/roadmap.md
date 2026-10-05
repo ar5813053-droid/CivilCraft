@@ -101,7 +101,15 @@
 - Schools & skill progression
 - Knowledge / literacy flags
 
-## Phase 7 — Cities & Infrastructure
+## Phase 7 — Cities & Infrastructure ✅
+
+- Settlement hierarchy and growth
+- Infrastructure and road records
+- Facility links to existing services
+
+---
+
+## Phase 7 notes
 
 - Multi-district cities
 - Road / path networks
