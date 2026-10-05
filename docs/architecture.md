@@ -224,3 +224,7 @@ Households reference villager ids. Houses may have null locations. Population ma
 ## Daily Life (Phase 9)
 
 Daily life owns activity, behavioral needs, happiness, stress, attendance aggregates, and cooldowns. Priority is emergency, healthcare, food, sleep, school/work, then leisure. Police and clinic schedules are not replaced. World data version is 9. Batch size is 40.
+
+## Household Food (Phase 10)
+
+Daily life asks Economy to buy wheat when household stock is low and hunger is below 35. purchaseGoods moves money and stock. Cooldown is one decision per household per day, including failures. Cap is 10 units. World data version is 10.

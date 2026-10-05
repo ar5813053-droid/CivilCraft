@@ -177,3 +177,9 @@ Each phase should ship with:
 - Needs, happiness, stress
 - Attendance aggregates
 - No pathfinding
+
+## Phase 10 — Household Food ✅
+
+- Household food decision
+- Economy purchaseGoods
+- Daily cooldown

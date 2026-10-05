@@ -4,8 +4,8 @@
 
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
-> **Current status:** Phase 9 — Citizen Daily Life  
-> Version: `1.8.0`  
+> **Current status:** Phase 10 — Household Food  
+> Version: `1.9.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -209,6 +209,7 @@ node tests/education/education.test.js
 node tests/settlements/settlements.test.js
 node tests/population/population.test.js
 node tests/dailylife/daily-life.test.js
+node tests/dailylife/food.test.js
 ```
 
 Static/structure tests only — in-game behavior requires a Bedrock client.
@@ -240,3 +241,7 @@ Houses and households are data records. Simulated citizens do not spawn entities
 ## Phase 9 Features (Daily Life)
 
 Activity, needs, happiness, and stress are simulation state. Health, money, housing, and jobs stay in their existing systems. Evaluations run in batches of 40 about every 30 seconds. No pathfinding.
+
+## Phase 10 Features (Household Food)
+
+One food purchase decision per household per day through purchaseGoods. Economy owns wallets and inventories. No free food. World data version is 10.

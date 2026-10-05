@@ -11,7 +11,8 @@ export function createDefaultDailyLife() {
     events: [],
     cursor: 0,
     day: 0,
-    cooldowns: {}
+    cooldowns: {},
+    food: { householdCooldowns: {}, recentResults: [] }
   };
 }
 
@@ -25,7 +26,11 @@ export function normalizeDailyLife(raw) {
     events: Array.isArray(raw.events) ? raw.events.slice(-MAX_DAILY_EVENTS) : [],
     cursor: Math.max(0, Math.floor(raw.cursor || 0)),
     day: Math.max(0, Math.floor(raw.day || 0)),
-    cooldowns: raw.cooldowns && typeof raw.cooldowns === "object" ? raw.cooldowns : {}
+    cooldowns: raw.cooldowns && typeof raw.cooldowns === "object" ? raw.cooldowns : {},
+    food: {
+      householdCooldowns: raw.food?.householdCooldowns && typeof raw.food.householdCooldowns === "object" ? raw.food.householdCooldowns : {},
+      recentResults: Array.isArray(raw.food?.recentResults) ? raw.food.recentResults.slice(-200) : []
+    }
   };
 }
 

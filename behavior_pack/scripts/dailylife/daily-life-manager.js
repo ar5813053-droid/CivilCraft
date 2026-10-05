@@ -11,6 +11,7 @@ import { ensureState, applyDecision, canShop } from "./citizen-state.js";
 import { tickNeeds, happinessScore, stressScore } from "./needs.js";
 import { pushDailyEvent } from "./daily-life-events.js";
 import { dailyStats } from "./daily-life-stats.js";
+import { evaluateHouseholdFood } from "./food.js";
 
 export const DAILY_INTERVAL_TICKS = 600;
 const BATCH = 40;
@@ -58,6 +59,7 @@ function evaluateBatch(data) {
     pushDailyEvent(store, "daily_reset", String(day));
   }
   const start = store.cursor % ids.length;
+  const evaluatedHouseholds = new Set();
   for (let i = 0; i < Math.min(BATCH, ids.length); i++) {
     const villager = data.villagers[ids[(start + i) % ids.length]];
     if (!villager || villager.alive === false) continue;
@@ -87,6 +89,16 @@ function evaluateBatch(data) {
       hunger: state.needs.hunger,
       health: state.needs.health
     }, state.stress);
+    if (household && !evaluatedHouseholds.has(household.id)) {
+      evaluatedHouseholds.add(household.id);
+      const members = (household.memberIds || []).map((id) => data.villagers[id]).filter(Boolean);
+      const needsById = {};
+      for (const member of members) {
+        const memberState = store.states.find((s) => s.villagerId === member.id);
+        needsById[member.id] = memberState?.needs || state.needs;
+      }
+      evaluateHouseholdFood(store, household, members, needsById, day);
+    }
   }
   store.cursor = (start + BATCH) % ids.length;
 }

@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 9 Daily Life).
+ * CivilCraft — entry point (Phase 10 Household Food).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -58,8 +58,9 @@ import { initializeHousing, formatHousingLines, getHousing } from "./housing/hou
 import { initializePopulation, formatPopulationLines, getPopulationStore } from "./population/population-manager.js";
 import { initializeDailyLife, formatDailyLines, getDailyLife } from "./dailylife/daily-life-manager.js";
 import { ROUTINES } from "./dailylife/routines.js";
+import { getHouseholdFoodStatus, evaluateHouseholdFood } from "./dailylife/food.js";
 
-Logger.info("CivilCraft Phase 9 loading…");
+Logger.info("CivilCraft Phase 10 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -637,6 +638,23 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           player.sendMessage(ROUTINES.join(", "));
           break;
 
+        case "food": {
+          const household = getPopulationStore().households.find((h) => h.id === args[2] || h.id === args[1]);
+          if (!household) {
+            player.sendMessage(`§7Food results ${getDailyLife().food?.recentResults?.length || 0}`);
+            break;
+          }
+          const members = getAllVillagers().filter((v) => household.memberIds?.includes(v.id));
+          if (args[1] === "buy") {
+            const result = evaluateHouseholdFood(getDailyLife(), household, members, {}, Math.floor(Date.now() / 86400000));
+            player.sendMessage(result.purchased ? "§aPurchased" : `§c${result.reason}`);
+            break;
+          }
+          const status = getHouseholdFoodStatus(household, members, {}, Math.floor(Date.now() / 86400000), getDailyLife().food?.householdCooldowns);
+          player.sendMessage(`food ${status.foodAvailable} need ${status.needsPurchase}`);
+          break;
+        }
+
         default:
           player.sendMessage("§cUnknown command. Try !cc help");
       }
@@ -649,4 +667,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 9 ready.");
+Logger.info("CivilCraft Phase 10 ready.");
