@@ -2,20 +2,34 @@
   "format_version": 2,
   "header": {
     "name": "CivilCraft Resource Pack",
-    "description": "Resources for CivilCraft living village simulation. Phase 1 foundation.",
+    "description": "Resources for CivilCraft. Phase 2 Economy.",
     "uuid": "9296565a-743a-4368-9426-d469027a5956",
-    "version": [1, 0, 0],
-    "min_engine_version": [1, 21, 0]
+    "version": [
+      1,
+      1,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      0
+    ]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "d08bc801-d82d-478d-ad19-ada5f340de27",
-      "version": [1, 0, 0]
+      "version": [
+        1,
+        0,
+        0
+      ]
     }
   ],
   "metadata": {
-    "authors": ["CivilCraft Team"],
+    "authors": [
+      "CivilCraft Team"
+    ],
     "license": "MIT",
     "url": "https://github.com/ar5813053-droid/CivilCraft"
   }

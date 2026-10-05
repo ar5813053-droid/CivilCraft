@@ -1,5 +1,5 @@
 /**
- * CivilCraft — Phase 1 entry point.
+ * CivilCraft — entry point (Phase 2 Economy).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -19,13 +19,21 @@ import { forceManageNearPlayers, ensureManaged } from "./villagers/villager-mana
 import { getAllVillagers, getPopulation } from "./villagers/villager-registry.js";
 import { getAllJobs } from "./jobs/job-registry.js";
 import { DEBUG } from "./core/constants.js";
+import { initializeEconomy, getEconomySnapshot, formatEconomyStatusLines } from "./economy/economy-manager.js";
+import { getAllGoods } from "./economy/goods-registry.js";
+import { getAllShops } from "./economy/shops.js";
+import { getRecentTransactions } from "./economy/transactions.js";
+import { getBalance, formatMoney } from "./economy/wallet.js";
+import { getPriceSnapshot } from "./economy/prices.js";
+import { CURRENCY_SYMBOL } from "./economy/economy-data.js";
 
-Logger.info("CivilCraft Phase 1 loading…");
+Logger.info("CivilCraft Phase 2 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
 initializeJobs();
 initializeSchedules();
+initializeEconomy();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -65,7 +73,10 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
       switch (cmd) {
         case "help":
           player.sendMessage(
-            "§6CivilCraft commands:§r !cc status | manage | population | jobs | village | save"
+            "§6CivilCraft:§r status manage population jobs village list save"
+          );
+          player.sendMessage(
+            "§6Economy:§r economy money prices goods shops transactions"
           );
           break;
 
@@ -119,6 +130,74 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           player.sendMessage("§aWorld data saved.");
           break;
 
+        case "economy": {
+          for (const line of formatEconomyStatusLines()) {
+            player.sendMessage(line);
+          }
+          break;
+        }
+
+        case "money": {
+          const villagers = getAllVillagers();
+          const total = villagers.reduce((s, v) => s + getBalance(v), 0);
+          const top = [...villagers]
+            .sort((a, b) => getBalance(b) - getBalance(a))
+            .slice(0, 5)
+            .map((v) => `${v.name}: ${formatMoney(getBalance(v), CURRENCY_SYMBOL)}`)
+            .join(" | ");
+          player.sendMessage(
+            `§aTotal villager money: ${formatMoney(total, CURRENCY_SYMBOL)}§r`
+          );
+          player.sendMessage(top || "§7No villagers");
+          break;
+        }
+
+        case "prices": {
+          const snap = getPriceSnapshot();
+          for (const p of snap) {
+            player.sendMessage(
+              `§e${p.id}§r ${p.price}${CURRENCY_SYMBOL} (base ${p.base}, s:${p.supply} d:${p.demand})`
+            );
+          }
+          break;
+        }
+
+        case "goods": {
+          const list = getAllGoods()
+            .map((g) => `${g.id}[${g.category}/${g.basePrice}${CURRENCY_SYMBOL}]`)
+            .join(", ");
+          player.sendMessage(list || "§7No goods");
+          break;
+        }
+
+        case "shops": {
+          const shops = getAllShops();
+          if (shops.length === 0) {
+            player.sendMessage("§7No shops");
+            break;
+          }
+          for (const s of shops.slice(0, 8)) {
+            player.sendMessage(
+              `§b${s.name}§r (${s.type}) bal:${s.balance}${CURRENCY_SYMBOL} open:${s.open} owner:${s.ownerId ? "yes" : "no"}`
+            );
+          }
+          break;
+        }
+
+        case "transactions": {
+          const txs = getRecentTransactions(8);
+          if (txs.length === 0) {
+            player.sendMessage("§7No recent transactions");
+            break;
+          }
+          for (const t of txs) {
+            player.sendMessage(
+              `§7${t.type}§r ${t.goodId || "-"} x${t.quantity} total:${t.total}${CURRENCY_SYMBOL} (${t.reason})`
+            );
+          }
+          break;
+        }
+
         default:
           player.sendMessage("§cUnknown command. Try !cc help");
       }
@@ -131,4 +210,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 1 ready.");
+Logger.info("CivilCraft Phase 2 ready.");

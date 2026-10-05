@@ -11,6 +11,6 @@ export function registerWorkerJob() {
     displayName: "Worker",
     description: "General laborer performing village maintenance tasks.",
     scheduleId: "default",
-    tags: ["labor"]
+    tags: ["economy", "labor"]
   });
 }

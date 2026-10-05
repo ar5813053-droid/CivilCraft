@@ -2,59 +2,76 @@
 
 **Deep, realistic Villager civilization simulation for Minecraft Bedrock Edition.**
 
-CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and the foundations of a living civilization.
+CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
-> **Current status:** Phase 1 — Living Village (foundation)  
-> Version: `1.0.0`  
+> **Current status:** Phase 2 — Economy  
+> Version: `1.1.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
 
-## Phase 1 Features
+## Phase 1 Features (Living Village)
+
+| System | Status |
+|--------|--------|
+| Villager identity | ✅ Unique ID, name, age, profession, home, workplace, needs, activity |
+| Jobs | ✅ Farmer, Worker, Trader, Builder, Citizen |
+| Daily schedules | ✅ Modular 06:00–22:00 cycle |
+| Households | ✅ Membership + shared home |
+| Simulation tiers | ✅ Active near player / lightweight data |
+| Persistence | ✅ World dynamic properties |
+
+## Phase 2 Features (Economy)
 
 | System | Status | Notes |
 |--------|--------|-------|
-| Villager identity | ✅ | Unique ID, name, age, profession, home, workplace, money, health, hunger, happiness, activity, schedule |
-| Job system | ✅ | Farmer, Worker, Trader, Builder, Citizen — extensible registry |
-| Daily schedules | ✅ | 06:00–22:00 default cycle; modular for per-job schedules later |
-| Households / families | ✅ | Household ID, members, shared home — no reproduction yet |
-| Simulation manager | ✅ | Active (near player) + lightweight identity persistence |
-| Village data model | ✅ | Population, job counts, happiness aggregates |
-| Persistence | ✅ | World dynamic properties |
-| Debug commands | ✅ | `!cc` chat commands (when DEBUG is enabled) |
+| Currency | ✅ | **CivilCoin (CC / ₡)** — integer balances |
+| Wallets | ✅ | Credit, debit, transfer; no negative balances |
+| Goods registry | ✅ | Wheat, bread, wood, stone, coal, iron, tools |
+| Production | ✅ | Farmers/workers produce; builders craft tools from materials |
+| Consumption | ✅ | Hunger drain; eat inventory or buy bread from shops |
+| Shops | ✅ | General, Food, Building Materials, Tool shops |
+| Trader job | ✅ | Shop ownership + surplus dividends |
+| Prices | ✅ | Gradual supply/demand adjustment |
+| Transactions | ✅ | Validated ledger (capped history) |
+| Village stats | ✅ | Total money, production, consumption, employment |
 
-**Not in Phase 1:** economy, government, police, courts, military, politics, multi-nation diplomacy, or mass entity spawning.
+**Not implemented yet:** government, taxes, laws, police, courts, military, politics, multi-nation diplomacy.
 
 ---
 
 ## Installation
 
-1. Download or clone this repository.
-2. Copy `behavior_pack` into your world's `behavior_packs` folder (or the global `development_behavior_packs` folder).
-3. Copy `resource_pack` into `resource_packs` / `development_resource_packs`.
-4. Create or open a world → **Behavior Packs** → activate **CivilCraft Behavior Pack**.
-5. Activate the matching **CivilCraft Resource Pack**.
-6. Ensure the world is running Minecraft Bedrock **1.21** or newer.
-7. (Optional) Enable content log for debugging.
+1. Clone this repository.
+2. Copy `behavior_pack` → world's `behavior_packs` (or `development_behavior_packs`).
+3. Copy `resource_pack` → `resource_packs` / `development_resource_packs`.
+4. Activate both packs on a Bedrock **1.21+** world.
+5. Optional: enable content log for debugging.
 
-No experimental gameplay toggles are required for Phase 1 stable APIs.
+No experimental gameplay toggles required for Phase 2 stable APIs.
 
 ---
 
 ## Development Commands
 
-When `DEBUG` is `true` in `scripts/core/constants.js`:
+When `DEBUG` is `true` and `chatSend` is available:
 
 | Command | Description |
 |---------|-------------|
 | `!cc help` | List commands |
 | `!cc status` | Population / village snapshot |
-| `!cc manage` | Adopt nearby vanilla villagers into CivilCraft |
-| `!cc population` | Registered villager count |
-| `!cc jobs` | List registered jobs |
-| `!cc list` | Show up to 10 managed villagers |
+| `!cc manage` | Adopt nearby vanilla villagers |
+| `!cc population` | Registered count |
+| `!cc jobs` | List jobs |
+| `!cc list` | Sample managed villagers |
 | `!cc village` | Dump default village data |
 | `!cc save` | Force-save world data |
+| `!cc economy` | Economy overview + prices |
+| `!cc money` | Total / top villager balances |
+| `!cc prices` | Per-good supply, demand, price |
+| `!cc goods` | Registered goods |
+| `!cc shops` | Shop list and balances |
+| `!cc transactions` | Recent ledger entries |
 
 ---
 
@@ -62,33 +79,53 @@ When `DEBUG` is `true` in `scripts/core/constants.js`:
 
 ```
 behavior_pack/scripts/
-├── main.js                 # Entry point, events, debug commands
-├── core/                   # Constants, logging, utils, data store
-├── villagers/              # Identity, registry, entity bridge
-├── jobs/                   # Extensible job registry + Phase 1 jobs
-├── schedules/              # Schedule templates & evaluation
-├── families/               # Household data model
-└── simulation/             # Active/lightweight simulation & village stats
+├── main.js
+├── core/
+├── villagers/
+├── jobs/
+├── schedules/
+├── families/
+├── economy/          ← Phase 2
+│   ├── economy-manager.js
+│   ├── wallet.js
+│   ├── goods-registry.js
+│   ├── inventory.js
+│   ├── transactions.js
+│   ├── prices.js
+│   ├── production.js
+│   ├── consumption.js
+│   ├── shops.js
+│   ├── businesses.js
+│   └── economy-data.js
+└── simulation/
 ```
 
-See [docs/architecture.md](docs/architecture.md) for design decisions and [docs/roadmap.md](docs/roadmap.md) for the full phase plan.
+See [docs/architecture.md](docs/architecture.md) and [docs/roadmap.md](docs/roadmap.md).
 
 ---
 
-## Performance Principles
+## Economy design (short)
 
-- No whole-world entity scans every tick.
-- Bounded `getEntities` queries around players only.
-- Schedule evaluation on a multi-second interval.
-- World data persisted infrequently.
-- Identity stored in a compact world-level blob; entities hold only a link.
+- **Money is not spawned from nowhere.** Production creates goods; selling/producing yields income; consumption spends it.
+- **Shops** restock from a village stockpile filled by workers and farmers.
+- **Prices** move slowly toward a target based on recent demand vs supply.
+- **Unloaded villagers** still participate via lightweight data ticks (no entity required).
 
 ---
 
-## Planned Systems (summary)
+## Performance
 
-1. Living Village ← *you are here*  
-2. Economy  
+- Economy runs about every 15 seconds, not every tick.
+- No world-wide entity scans for economic logic.
+- Transaction history is a fixed-size ring buffer.
+- Designed for mobile Bedrock clients.
+
+---
+
+## Planned Systems
+
+1. Living Village ✅  
+2. Economy ✅  
 3. Government  
 4. Laws & Justice  
 5. Police & Emergency  
@@ -99,6 +136,18 @@ See [docs/architecture.md](docs/architecture.md) for design decisions and [docs/
 10. Multiple Nations & Diplomacy  
 11. Media & Dynamic Events  
 12. Advanced Civilization Simulation  
+
+---
+
+## Tests
+
+```bash
+node tests/validate-structure.js
+node tests/economy/wallet.test.js
+node tests/economy/prices.test.js
+```
+
+Static/structure tests only — in-game behavior requires a Bedrock client.
 
 ---
 

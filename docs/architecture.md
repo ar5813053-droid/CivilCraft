@@ -4,14 +4,14 @@
 
 - Production-oriented, modular foundation for a long-lived civilization simulation.
 - Safe performance on mobile Bedrock clients.
-- Clear boundaries so future phases (economy, government, etc.) plug in without rewriting Phase 1.
+- Clear boundaries so future phases (government, law, etc.) plug in without rewriting prior work.
 
 ## Pack Layout
 
 | Pack | Role |
 |------|------|
 | `behavior_pack` | Scripts, data, future entity/item definitions |
-| `resource_pack` | Textures, UI, localization (minimal in Phase 1) |
+| `resource_pack` | Textures, UI, localization (minimal in Phase 1–2) |
 
 Script entry: `behavior_pack/scripts/main.js`.
 
@@ -20,87 +20,137 @@ Script entry: `behavior_pack/scripts/main.js`.
 ```
 main.js
   │
-  ├── core/          # Shared primitives (no domain logic)
-  │     constants, logger, utils, data-store
-  │
+  ├── core/          # Constants, logging, utils, data-store
   ├── villagers/     # Identity + entity linkage
-  │     villager-identity, villager-registry, villager-manager
-  │
   ├── jobs/          # Profession definitions (extensible)
-  │     job-registry + jobs/*
-  │
   ├── schedules/     # Time-of-day activity resolution
-  │     default-schedule, schedule-manager
-  │
   ├── families/      # Household membership
-  │     household-manager
-  │
+  ├── economy/       # Phase 2 — money, goods, shops, prices
   └── simulation/    # Orchestration & village aggregates
-        simulation-manager, village-data
 ```
+
+### Economy modules (`economy/`)
+
+| File | Role |
+|------|------|
+| `economy-data.js` | Schema, defaults, currency config, migration normalize |
+| `wallet.js` | Integer balance credit/debit/transfer |
+| `goods-registry.js` | Good definitions (wheat, bread, wood, …) |
+| `inventory.js` | Map-based inventory helpers |
+| `transactions.js` | Validated multi-party operations + ledger ring buffer |
+| `prices.js` | Supply/demand pricing (gradual lerp) |
+| `production.js` | Job → goods cycles + production income |
+| `consumption.js` | Hunger drain, eat own food, buy from shops |
+| `shops.js` | Shop records, restock from village stock |
+| `businesses.js` | Trader ↔ shop ownership, dividends |
+| `economy-manager.js` | Interval orchestration + aggregates |
 
 ### Data ownership
 
 | Concern | Owner | Storage |
 |---------|-------|---------|
-| Villager identity fields | `villager-registry` | World dynamic property blob |
-| Entity ↔ identity link | `villager-manager` | Entity dynamic property + tag |
-| Job definitions | `job-registry` | In-memory (code) |
-| Schedule templates | `schedule-manager` | In-memory (code) |
-| Households | `household-manager` | World data blob |
-| Village aggregates | `village-data` / simulation | World data blob |
+| Villager identity + `money` + `inventory` | villager-registry | World dynamic property blob |
+| Entity ↔ identity link | villager-manager | Entity dynamic property + tag |
+| Job definitions | job-registry | In-memory (code) |
+| Schedule templates | schedule-manager | In-memory (code) |
+| Households | household-manager | World data blob |
+| Shops, market, village stock, tx log | economy | `worldData.economy` |
+| Village aggregates | village-data / economy-manager | World data blob |
 
-Entities never hold the full identity record. They store only `civilcraft:villager_id`. This keeps entity memory small and survives unload/reload cleanly.
+Entities never hold full identity or inventory. They store only `civilcraft:villager_id`.
 
 ## Simulation tiers
 
-1. **Active** — villagers within `ACTIVE_SIMULATION_RADIUS` of any player.  
-   Schedule evaluation runs here.
-2. **Lightweight** — registered identities farther away or unloaded.  
-   Data remains in the world store; no per-tick work.
-3. **Background civilization** — reserved for later phases (chunk-independent economic/political ticks).
+1. **Active** — villagers within radius of any player (schedule evaluation).
+2. **Lightweight** — all registered identities participate in economy ticks via data only (no entity queries required for production/consumption).
+3. **Background civilization** — reserved for later phases.
+
+## Economy data flow
+
+```
+Work activity
+    → production.js (goods → villageStock + personal inventory)
+    → grantIncome (wallet credit, ledger entry)
+
+Hunger low
+    → consumption.js
+        → eat own inventory
+        OR purchaseGoods from shop (validated tx)
+        → demand pressure recorded
+
+Economy tick
+    → restock shops from villageStock
+    → supply snapshot (stock + shops + inventories)
+    → prices.js lerp toward supply/demand target
+    → trader dividends if shop surplus
+    → village economy aggregates
+```
+
+### Transaction rules
+
+- Integer CivilCoins only; no negative balances.
+- Stock checked before money movement; rollbacks on failure.
+- Recent transactions capped (ring buffer, 50 entries).
+- No free money: income requires production or a funded transfer.
+
+### Price formula
+
+```
+ratio  = demand / max(supply, 1)
+factor = clamp(0.5 + 0.5 * ratio, 0.5, 2.0)
+target = basePrice * factor
+next   = lerp(current, target, 0.15)
+next   = clamp(round(next), minPrice, maxPrice)
+demand *= 0.85  // decay each price tick
+```
 
 ## Performance rules
 
-- Intervals measured in tens–hundreds of ticks, not every tick.
-- Entity queries always distance-limited and type-filtered.
-- No recursive world scans.
-- World JSON blob kept deliberately small in Phase 1; future phases may shard by village/region.
+- Economy interval ~300 ticks (~15s); prices every 2nd economy tick.
+- No whole-world entity scans for economy.
+- Production/consumption iterate registered villager records (in-memory).
+- Transaction history bounded.
+- World JSON kept deliberately modest; shops and stock are aggregate maps.
+
+## Persistence
+
+World dynamic property key: `civilcraft:world_data`
+
+```json
+{
+  "version": 2,
+  "villagers": { "<id>": { /* + inventory, money */ } },
+  "households": {},
+  "villages": {},
+  "managedEntityIds": [],
+  "economy": {
+    "version": 1,
+    "currencyCode": "CC",
+    "shops": {},
+    "market": { "supply": {}, "demand": {}, "prices": {} },
+    "totals": {},
+    "recentTransactions": [],
+    "villageStock": {}
+  }
+}
+```
+
+`normalizeEconomyData()` fills missing fields on load (Phase 1 → Phase 2 safe).
 
 ## Extension points
 
 | Future need | Hook |
 |-------------|------|
-| New job | `registerJob()` + optional schedule id |
-| Per-job schedule | `registerSchedule(id, entries)` then set `job.scheduleId` |
-| Needs / AI behaviors | React to `currentActivity` changes inside simulation tick |
-| Economy | Add fields to `VillagerRecord` / village stats; new module under `economy/` |
-| Government | New module; village data already has placeholder aggregate slots |
+| New good | `registerGood()` |
+| New job production | `PRODUCTION_RECIPES` in production.js |
+| Taxes / public pay | Call `transferMoney` / `grantIncome` from government module |
+| Physical shop blocks | Map structure location → `ShopRecord.id` |
+| Loans / credit | Extend wallet with explicit credit limit flag |
 
-## Script API surface (Phase 1)
+## Script API surface
 
-- `@minecraft/server` stable track (`1.17.0` dependency declared)
-- `world` dynamic properties
-- `entity` dynamic properties & tags
+- `@minecraft/server` stable (`1.17.0` dependency)
+- World + entity dynamic properties
 - `system.runInterval`
-- `world.afterEvents.entitySpawn` (+ `entityLoad` when present)
-- `world.beforeEvents.chatSend` (debug only)
-- Bounded `dimension.getEntities`
-
-No beta modules are required.
-
-## Persistence format
-
-Single world dynamic property key: `civilcraft:world_data`
-
-```json
-{
-  "version": 1,
-  "villagers": { "<id>": { /* VillagerRecord */ } },
-  "households": { "<id>": { /* HouseholdRecord */ } },
-  "villages": { "<id>": { /* VillageData */ } },
-  "managedEntityIds": []
-}
-```
-
-Version field exists for future migrations.
+- Entity spawn/load events
+- Optional `chatSend` for debug commands

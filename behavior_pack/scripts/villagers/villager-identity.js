@@ -34,6 +34,8 @@ import { DEFAULT_JOB_ID } from "../core/constants.js";
  * @property {number} createdAt
  * @property {number} lastUpdated
  * @property {string|null} entityId  // last known runtime entity id (not durable)
+ * @property {Record<string, number>} inventory  // economic goods (Phase 2)
+ * @property {boolean} [_economySeeded]
  */
 
 /**
@@ -59,7 +61,9 @@ export function createVillagerRecord(overrides = {}) {
     scheduleId: overrides.scheduleId ?? "default",
     createdAt: overrides.createdAt ?? now,
     lastUpdated: overrides.lastUpdated ?? now,
-    entityId: overrides.entityId ?? null
+    entityId: overrides.entityId ?? null,
+    inventory: overrides.inventory ?? {},
+    _economySeeded: overrides._economySeeded ?? false
   };
 }
 

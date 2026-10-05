@@ -1,6 +1,6 @@
 # CivilCraft Roadmap
 
-## Phase 1 — Living Village ✅ (foundation)
+## Phase 1 — Living Village ✅
 
 - Persistent villager identity
 - Job registry (Farmer, Worker, Trader, Builder, Citizen)
@@ -11,17 +11,23 @@
 - World-level persistence
 - Development debug commands
 
-**Out of scope for Phase 1:** economy loops, government, police, courts, military, politics, multi-nation systems, mass spawning.
+## Phase 2 — Economy ✅
+
+- Integer currency (CivilCoin / CC)
+- Wallet credit / debit / transfer with validation
+- Goods registry (wheat, bread, wood, stone, coal, iron, tools)
+- Job production cycles → village stock + income
+- Villager inventories and consumption (food)
+- Shops (general, food, building, tools) with restock
+- Trader ↔ shop ownership and dividends
+- Supply/demand pricing (gradual)
+- Centralized transactions + bounded ledger
+- Village economic aggregates
+- Economy debug commands
+
+**Out of scope for Phase 2:** government, taxes, laws, police, courts, military, politics, multi-nation systems.
 
 ---
-
-## Phase 2 — Economy
-
-- Currency & wallets (expand existing `money` field)
-- Simple goods production / consumption
-- Shops and trade posts
-- Price signals driven by local supply
-- Workplace → output linkage for farmers/workers
 
 ## Phase 3 — Government
 

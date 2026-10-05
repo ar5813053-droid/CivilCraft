@@ -15,6 +15,7 @@
  * @property {number} workplaceCount
  * @property {number} averageHappiness
  * @property {number} createdAt
+ * @property {object} [economy]  // Phase 2 aggregates
  */
 
 /**

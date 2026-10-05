@@ -11,6 +11,6 @@ export function registerFarmerJob() {
     displayName: "Farmer",
     description: "Works fields and tends crops.",
     scheduleId: "default",
-    tags: ["production", "agriculture"]
+    tags: ["economy", "production", "agriculture"]
   });
 }

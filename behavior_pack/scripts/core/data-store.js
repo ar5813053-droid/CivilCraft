@@ -22,14 +22,16 @@ import { safeJsonParse } from "./utils.js";
  * @property {Record<string, object>} households // id -> HouseholdRecord
  * @property {Record<string, VillageData>} villages
  * @property {string[]} managedEntityIds       // optional cache of known entity ids
+ * @property {object|null} economy               // Phase 2 economy blob
  */
 
 const DEFAULT_WORLD_DATA = () => ({
-  version: 1,
+  version: 2,
   villagers: {},
   households: {},
   villages: {},
-  managedEntityIds: []
+  managedEntityIds: [],
+  economy: null // filled by economy-manager on init
 });
 
 let cache = null;
@@ -48,13 +50,14 @@ export function loadWorldData() {
       const parsed = safeJsonParse(raw, null);
       if (parsed && typeof parsed === "object" && parsed.version) {
         cache = {
-          version: parsed.version ?? 1,
+          version: parsed.version ?? 2,
           villagers: parsed.villagers ?? {},
           households: parsed.households ?? {},
           villages: parsed.villages ?? {},
           managedEntityIds: Array.isArray(parsed.managedEntityIds)
             ? parsed.managedEntityIds
-            : []
+            : [],
+          economy: parsed.economy ?? null
         };
         Logger.debug("World data loaded from dynamic property.");
         return cache;

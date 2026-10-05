@@ -11,6 +11,6 @@ export function registerBuilderJob() {
     displayName: "Builder",
     description: "Constructs and repairs village structures.",
     scheduleId: "default",
-    tags: ["construction", "labor"]
+    tags: ["economy", "construction", "labor"]
   });
 }
