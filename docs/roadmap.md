@@ -45,7 +45,22 @@
 
 ---
 
-## Phase 4 — Laws & Justice
+## Phase 4 — Laws & Justice ✅
+
+- Data-driven law registry
+- Explicit violation reports with cooldowns
+- Case records and status transitions
+- Penalties and treasury-backed fines
+- Outstanding fines preserved
+- Derived legal status
+- Bounded justice event log
+
+**Out of scope:** police AI, court hearings, prisons, elections, military.
+
+---
+
+## Phase 4 notes
+
 
 - Law definitions (data-driven)
 - Crime detection hooks

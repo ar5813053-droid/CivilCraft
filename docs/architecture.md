@@ -187,3 +187,20 @@ approval = clamp(
 ```
 
 Government records live in `worldData.government.governments` keyed by id so later nations can coexist. Only `municipal` is active. World data version is 3. `normalizeGovernmentStore()` repairs missing or corrupt fields.
+
+
+## Justice (Phase 4)
+
+Laws are definitions. Violations are created only through `reportViolation`. Cases and penalties are persisted records.
+
+```
+reportViolation (cooldown per villager+law)
+    → openCase
+    → issueFine
+        → computeFine (repeat multiplier, cap 200)
+        → transferMoney type legal_fine
+        → government treasury
+        → outstanding remainder kept if unpaid
+```
+
+Public Safety department remains disabled. Tax evasion is a law definition only; tax collection is unchanged. World data version is 4. `normalizeJustice()` bounds lists and fills missing fields without clearing economy or government.

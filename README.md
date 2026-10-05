@@ -4,8 +4,8 @@
 
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
-> **Current status:** Phase 3 — Government  
-> Version: `1.2.0`  
+> **Current status:** Phase 4 — Laws & Justice  
+> Version: `1.3.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -36,7 +36,22 @@ CivilCraft turns vanilla villagers into persistent citizens with identities, job
 | Transactions | ✅ | Validated ledger (capped history) |
 | Village stats | ✅ | Total money, production, consumption, employment |
 
-**Not implemented yet:** elections, parties, laws, police, courts, military, diplomacy.
+**Not implemented yet:** police, courts, prisons, elections, military.
+
+## Phase 4 Features (Laws & Justice)
+
+| System | Status | Notes |
+|--------|--------|-------|
+| Law registry | ✅ | theft, property damage, assault, trespassing, public disturbance, tax evasion |
+| Violations | ✅ | Explicit report API, cooldown, no auto crime |
+| Cases | ✅ | Status transitions for future courts |
+| Penalties | ✅ | Warning, fine, community service, temporary restriction record |
+| Fines | ✅ | Paid into government treasury; unpaid stays outstanding |
+| Legal status | ✅ | clean / warned / fined / wanted / restricted |
+| Debug | ✅ | `!cc justice laws law violations cases case legal fine justiceevents` |
+
+Police patrols, court AI, prisons, and elections are not in this phase.
+
 
 ## Phase 3 Features (Government)
 
@@ -52,7 +67,22 @@ CivilCraft turns vanilla villagers into persistent citizens with identities, job
 | Approval | ✅ | Economy, tax, unemployment, spending, food |
 | Debug commands | ✅ | `!cc government`, `leader`, `treasury`, `taxes`, `budget`, `departments`, `approval`, `govtransactions` |
 
-**Not implemented yet:** elections, parties, laws, police, courts, military, diplomacy.
+**Not implemented yet:** police, courts, prisons, elections, military.
+
+## Phase 4 Features (Laws & Justice)
+
+| System | Status | Notes |
+|--------|--------|-------|
+| Law registry | ✅ | theft, property damage, assault, trespassing, public disturbance, tax evasion |
+| Violations | ✅ | Explicit report API, cooldown, no auto crime |
+| Cases | ✅ | Status transitions for future courts |
+| Penalties | ✅ | Warning, fine, community service, temporary restriction record |
+| Fines | ✅ | Paid into government treasury; unpaid stays outstanding |
+| Legal status | ✅ | clean / warned / fined / wanted / restricted |
+| Debug | ✅ | `!cc justice laws law violations cases case legal fine justiceevents` |
+
+Police patrols, court AI, prisons, and elections are not in this phase.
+
 
 
 ---
@@ -152,7 +182,7 @@ See [docs/architecture.md](docs/architecture.md) and [docs/roadmap.md](docs/road
 1. Living Village ✅  
 2. Economy ✅  
 3. Government ✅  
-4. Laws & Justice  
+4. Laws & Justice ✅  
 5. Police & Emergency  
 6. Healthcare & Education  
 7. Cities & Infrastructure  
@@ -171,6 +201,7 @@ node tests/validate-structure.js
 node tests/economy/wallet.test.js
 node tests/economy/prices.test.js
 node tests/government/government.test.js
+node tests/justice/justice.test.js
 ```
 
 Static/structure tests only — in-game behavior requires a Bedrock client.

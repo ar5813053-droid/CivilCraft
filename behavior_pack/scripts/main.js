@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 3 Government).
+ * CivilCraft — entry point (Phase 4 Laws & Justice).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -29,8 +29,18 @@ import { CURRENCY_SYMBOL } from "./economy/economy-data.js";
 import { initializeGovernment, formatGovernmentLines, getGovernmentSnapshot } from "./government/government-manager.js";
 import { appoint, getGovernment } from "./government/leadership.js";
 import { createProject } from "./government/public-spending.js";
+import {
+  initializeJustice,
+  formatJusticeLines,
+  getJustice,
+  reportViolation,
+  getAllLaws,
+  getLaw,
+  getLegalStatus
+} from "./justice/justice-manager.js";
+import { issueFine } from "./justice/penalties.js";
 
-Logger.info("CivilCraft Phase 3 loading…");
+Logger.info("CivilCraft Phase 4 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -38,6 +48,7 @@ initializeJobs();
 initializeSchedules();
 initializeEconomy();
 initializeGovernment();
+initializeJustice();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -84,6 +95,9 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           );
           player.sendMessage(
             "§6Government:§r government leader treasury taxes budget departments approval govtransactions"
+          );
+          player.sendMessage(
+            "§6Justice:§r justice laws law violations cases case legal fine justiceevents"
           );
           break;
 
@@ -297,6 +311,63 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           break;
         }
 
+        case "justice": {
+          for (const line of formatJusticeLines()) player.sendMessage(line);
+          break;
+        }
+
+        case "laws": {
+          player.sendMessage(getAllLaws().map((l) => l.id).join(", "));
+          break;
+        }
+
+        case "law": {
+          const law = getLaw(args[1]);
+          player.sendMessage(law ? `${law.name} sev ${law.severity} fine ${law.fine}` : "§cUnknown law");
+          break;
+        }
+
+        case "violations": {
+          const list = (getJustice().violations || []).slice(-5);
+          player.sendMessage(list.map((v) => `${v.lawId}:${v.status}`).join(" | ") || "§7None");
+          break;
+        }
+
+        case "cases": {
+          const list = (getJustice().cases || []).slice(-5);
+          player.sendMessage(list.map((c) => `${c.caseId}:${c.status}`).join(" | ") || "§7None");
+          break;
+        }
+
+        case "case": {
+          const found = (getJustice().cases || []).find((c) => c.caseId === args[1]);
+          player.sendMessage(found ? `${found.caseId} ${found.status}` : "§cNo case");
+          break;
+        }
+
+        case "legal": {
+          const id = args[1] || getAllVillagers()[0]?.id;
+          player.sendMessage(id ? `${id}: ${getLegalStatus(getJustice(), id)}` : "§7No villager");
+          break;
+        }
+
+        case "fine": {
+          const id = args[1] || getAllVillagers()[0]?.id;
+          if (!id) {
+            player.sendMessage("§cNo villager");
+            break;
+          }
+          const result = issueFine(getJustice(), id, "theft");
+          player.sendMessage(result.ok ? `§aFine ${result.penalty.amount} (${result.penalty.status})` : `§c${result.error}`);
+          break;
+        }
+
+        case "justiceevents": {
+          const events = (getJustice().events || []).slice(-6);
+          player.sendMessage(events.map((e) => e.type).join(", ") || "§7None");
+          break;
+        }
+
         default:
           player.sendMessage("§cUnknown command. Try !cc help");
       }
@@ -309,4 +380,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 3 ready.");
+Logger.info("CivilCraft Phase 4 ready.");

@@ -28,7 +28,8 @@ export const TxType = Object.freeze({
   RESTOCK: "restock",
   TAX: "tax",
   GOVERNMENT_EXPENSE: "government_expense",
-  BUDGET_TRANSFER: "budget_transfer"
+  BUDGET_TRANSFER: "budget_transfer",
+  LEGAL_FINE: "legal_fine"
 });
 
 /**
