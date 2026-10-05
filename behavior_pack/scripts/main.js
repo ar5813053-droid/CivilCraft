@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 7 Cities & Infrastructure).
+ * CivilCraft — entry point (Phase 8 Housing & Population).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -54,8 +54,10 @@ import { createSchool } from "./education/schools.js";
 import { initializeSettlements, formatSettlementLines, getSettlement, getSettlementStore, evaluateGrowth } from "./settlements/settlement-manager.js";
 import { typeForPopulation } from "./settlements/settlement-types.js";
 import { initializeInfrastructure, formatInfraLines, getInfrastructure } from "./infrastructure/infrastructure-manager.js";
+import { initializeHousing, formatHousingLines, getHousing } from "./housing/housing-manager.js";
+import { initializePopulation, formatPopulationLines, getPopulationStore } from "./population/population-manager.js";
 
-Logger.info("CivilCraft Phase 7 loading…");
+Logger.info("CivilCraft Phase 8 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -70,6 +72,8 @@ initializeHealthcare();
 initializeEducation();
 initializeSettlements();
 initializeInfrastructure();
+initializeHousing();
+initializePopulation();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -579,6 +583,39 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           player.sendMessage(getInfrastructure().roads.map((r) => r.id).join(", ") || "§7None");
           break;
 
+        case "population":
+        case "demographics":
+        case "births":
+        case "deaths":
+          for (const line of formatPopulationLines()) player.sendMessage(line);
+          break;
+
+        case "household": {
+          const household = getPopulationStore().households.find((h) => h.id === args[1]);
+          player.sendMessage(household ? `${household.id} ${household.status} size ${household.size}` : `§7Households ${getPopulationStore().households.length}`);
+          break;
+        }
+
+        case "houses":
+        case "housing":
+        case "house": {
+          if (args[1] && args[1] !== "stats") {
+            const house = getHousing().houses.find((h) => h.id === args[1]);
+            player.sendMessage(house ? `${house.type} ${house.status}` : "§cNo house");
+            break;
+          }
+          for (const line of formatHousingLines()) player.sendMessage(line);
+          break;
+        }
+
+        case "family":
+          player.sendMessage(`§7Relationships ${getPopulationStore().relationships.length}`);
+          break;
+
+        case "migrate":
+          player.sendMessage(`§7Migrations ${getPopulationStore().migrations.length}`);
+          break;
+
         default:
           player.sendMessage("§cUnknown command. Try !cc help");
       }
@@ -591,4 +628,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 7 ready.");
+Logger.info("CivilCraft Phase 8 ready.");

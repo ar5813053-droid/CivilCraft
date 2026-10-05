@@ -36,7 +36,9 @@ export const TxType = Object.freeze({
   MEDICAL_EXPENSE: "medical_expense",
   GOVERNMENT_HEALTHCARE: "government_healthcare_expense",
   EDUCATION_EXPENSE: "education_expense",
-  GOVERNMENT_EDUCATION: "government_education_expense"
+  GOVERNMENT_EDUCATION: "government_education_expense",
+  HOUSING_RENT: "housing_rent",
+  HOUSING_PURCHASE: "housing_purchase"
 });
 
 /**

@@ -116,7 +116,17 @@
 - Housing density rules
 - Infrastructure upkeep
 
-## Phase 8 — Military
+## Phase 8 — Housing, Population & Families ✅
+
+- Houses, households, relationships
+- Simulated citizens without entity spawn
+- Migration and homelessness records
+
+---
+
+## Phase 8 notes
+
+## Phase 8b — Military
 
 - Soldier / officer jobs
 - Training grounds

@@ -4,8 +4,8 @@
 
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
-> **Current status:** Phase 7 — Cities & Infrastructure  
-> Version: `1.6.0`  
+> **Current status:** Phase 8 — Housing, Population & Families  
+> Version: `1.7.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -186,7 +186,7 @@ See [docs/architecture.md](docs/architecture.md) and [docs/roadmap.md](docs/road
 5. Police & Emergency ✅  
 6. Healthcare & Education ✅  
 7. Cities & Infrastructure ✅  
-8. Military  
+8. Housing & Population ✅  
 9. Politics & Elections  
 10. Multiple Nations & Diplomacy  
 11. Media & Dynamic Events  
@@ -207,6 +207,7 @@ node tests/emergency/emergency.test.js
 node tests/healthcare/healthcare.test.js
 node tests/education/education.test.js
 node tests/settlements/settlements.test.js
+node tests/population/population.test.js
 ```
 
 Static/structure tests only — in-game behavior requires a Bedrock client.
@@ -230,3 +231,7 @@ Health records, clinics, treatments billed through wallets, medical emergency ho
 ## Phase 7 Features (Cities & Infrastructure)
 
 Settlements progress village → town → city → metro without downgrades. Infrastructure and roads are data bindings. Existing clinic, school, and station records are referenced, not copied. No procedural city generation.
+
+## Phase 8 Features (Housing, Population & Families)
+
+Houses and households are data records. Simulated citizens do not spawn entities. Existing villager ids, wallets, and jobs are preserved. Homelessness is tracked. Rent cannot drive a wallet negative. World data version is 8.

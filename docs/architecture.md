@@ -216,3 +216,7 @@ Records are keyed by villagerId. Treatment uses medical_expense or a treasury su
 ## Settlements & Infrastructure (Phase 7)
 
 `settlement_main` is created once from the existing village. Type thresholds are configurable and never downgrade. Prosperity moves 25% toward the new score each evaluation. Infrastructure records may have null locations. Public works can set infrastructureId and improve condition when completed. World data version is 7. Stats run about every 60 seconds.
+
+## Housing & Population (Phase 8)
+
+Households reference villager ids. Houses may have null locations. Population manager is the settlement population source. Demographics advance in batches of 40 about every 3 minutes. Housing condition decays on a similar interval. New citizens from createVillagerProfile are simulated records. Death updates records only and is not triggered by low health. World data version is 8.
