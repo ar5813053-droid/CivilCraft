@@ -163,6 +163,7 @@ const required = [
   "behavior_pack/scripts/dailylife/daily-life-events.js",
   "behavior_pack/scripts/dailylife/daily-life-stats.js",
   "behavior_pack/scripts/dailylife/food.js",
+  "behavior_pack/scripts/dailylife/consumption.js",
 
   "docs/architecture.md",
   "docs/roadmap.md",

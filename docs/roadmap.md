@@ -183,3 +183,9 @@ Each phase should ship with:
 - Household food decision
 - Economy purchaseGoods
 - Daily cooldown
+
+## Phase 11 — Citizen Consumption ✅
+
+- Bread meals
+- Demand recording
+- Hunger recovery without a second inventory

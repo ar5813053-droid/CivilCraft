@@ -228,3 +228,7 @@ Daily life owns activity, behavioral needs, happiness, stress, attendance aggreg
 ## Household Food (Phase 10)
 
 Daily life asks Economy to buy wheat when household stock is low and hunger is below 35. purchaseGoods moves money and stock. Cooldown is one decision per household per day, including failures. Cap is 10 units. World data version is 10.
+
+## Consumption (Phase 11)
+
+Bread is the consumable food. Wheat stays an ingredient. Meals call consumeOwnGoods and recordDemand. Hunger decay remains in tickNeeds. One meal per citizen per day. World data version is 11.

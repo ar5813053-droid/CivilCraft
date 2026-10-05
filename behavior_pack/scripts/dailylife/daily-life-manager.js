@@ -12,6 +12,7 @@ import { tickNeeds, happinessScore, stressScore } from "./needs.js";
 import { pushDailyEvent } from "./daily-life-events.js";
 import { dailyStats } from "./daily-life-stats.js";
 import { evaluateHouseholdFood } from "./food.js";
+import { evaluateCitizenConsumption } from "./consumption.js";
 
 export const DAILY_INTERVAL_TICKS = 600;
 const BATCH = 40;
@@ -99,6 +100,8 @@ function evaluateBatch(data) {
       }
       evaluateHouseholdFood(store, household, members, needsById, day);
     }
+    const meal = evaluateCitizenConsumption(store, villager, state.needs, day);
+    if (meal.consumed) state.activity = "eating";
   }
   store.cursor = (start + BATCH) % ids.length;
 }

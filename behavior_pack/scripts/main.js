@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 10 Household Food).
+ * CivilCraft — entry point (Phase 11 Citizen Consumption).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -59,8 +59,9 @@ import { initializePopulation, formatPopulationLines, getPopulationStore } from 
 import { initializeDailyLife, formatDailyLines, getDailyLife } from "./dailylife/daily-life-manager.js";
 import { ROUTINES } from "./dailylife/routines.js";
 import { getHouseholdFoodStatus, evaluateHouseholdFood } from "./dailylife/food.js";
+import { evaluateCitizenConsumption, getConsumptionStatus } from "./dailylife/consumption.js";
 
-Logger.info("CivilCraft Phase 10 loading…");
+Logger.info("CivilCraft Phase 11 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -655,6 +656,25 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           break;
         }
 
+        case "consume": {
+          const villager = getAllVillagers().find((v) => v.id === args[1]) || getAllVillagers()[0];
+          if (!villager) {
+            player.sendMessage("§cNo villager");
+            break;
+          }
+          const store = getDailyLife();
+          const state = store.states.find((s) => s.villagerId === villager.id);
+          const needs = state?.needs || { hunger: 50 };
+          if (args[1] === "status") {
+            const status = getConsumptionStatus(villager, needs.hunger, Math.floor(Date.now() / 86400000), store.consumption?.citizenCooldowns);
+            player.sendMessage(`hunger ${needs.hunger} food ${status.foodAvailable || "none"}`);
+            break;
+          }
+          const result = evaluateCitizenConsumption(store, villager, needs, Math.floor(Date.now() / 86400000));
+          player.sendMessage(`${result.reason} ${result.hungerBefore}->${result.hungerAfter}`);
+          break;
+        }
+
         default:
           player.sendMessage("§cUnknown command. Try !cc help");
       }
@@ -667,4 +687,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 10 ready.");
+Logger.info("CivilCraft Phase 11 ready.");

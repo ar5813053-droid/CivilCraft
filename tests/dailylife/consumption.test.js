@@ -1,0 +1,51 @@
+/** Consumption loop tests. Run: node tests/dailylife/consumption.test.js */
+const RESTORE = 40;
+function consume(store, villager, hunger, day, economy) {
+  if (store.cooldowns[villager.id] === day) return { consumed: false, hungerAfter: hunger, reason: "already_consumed" };
+  if (hunger >= 70) return { consumed: false, hungerAfter: hunger, reason: "already_consumed" };
+  if (!economy.goods.bread) return { consumed: false, hungerAfter: hunger, reason: "unsupported_food" };
+  if ((villager.inventory.bread || 0) < 1) return { consumed: false, hungerAfter: hunger, reason: "no_food" };
+  villager.inventory.bread -= 1;
+  economy.demand.bread = (economy.demand.bread || 0) + 1;
+  economy.moneyUnchanged = villager.money;
+  store.cooldowns[villager.id] = day;
+  store.results.push(villager.id);
+  return { consumed: true, goodId: "bread", hungerAfter: Math.min(100, hunger + RESTORE), reason: "daily_meal" };
+}
+let passed = 0, failed = 0;
+function assert(c, m) { if (c) { passed++; console.log("  ✓ "+m);} else { failed++; console.error("  ✗ "+m);} }
+console.log("Consumption\n");
+const economy = { goods: { bread: true, wheat: false }, demand: {}, price: 8 };
+const villager = { id: "v1", money: 20, inventory: { bread: 1 }, homeless: true, profession: "citizen" };
+const store = { cooldowns: {}, results: [] };
+const meal = consume(store, villager, 30, 4, economy);
+assert(meal.consumed && meal.hungerAfter === 70, "citizen with food consumes and hunger rises");
+assert(villager.inventory.bread === 0, "inventory decreases through economy path");
+assert(villager.money === 20, "no money deducted");
+assert(economy.demand.bread === 1 && economy.price === 8, "demand increases and price is not edited");
+assert(consume(store, villager, 30, 4, economy).reason === "already_consumed", "daily cooldown blocks second meal");
+assert(consume({ cooldowns: {}, results: [] }, { id: "v2", money: 5, inventory: {} }, 20, 1, economy).reason === "no_food", "no food");
+assert(Math.min(100, 80 + 40) === 100, "hunger clamps at 100");
+assert(consume({ cooldowns: {}, results: [] }, { id: "v3", money: 1, inventory: { wheat: 4 } }, 10, 1, economy).reason === "no_food", "wheat is not consumed");
+const happyBefore = 40 + (30 - 40) * 0.25;
+const happyAfter = happyBefore + ((70 - happyBefore) * 0.25);
+assert(happyAfter > happyBefore, "happiness reacts through smoothing");
+const stressBefore = 40;
+const stressAfter = stressBefore + ((20 - stressBefore) * 0.25);
+assert(stressAfter < stressBefore, "stress reacts through smoothing");
+assert(consume({ cooldowns: {}, results: [] }, villager.id ? { id: "home", money: 0, inventory: { bread: 1 }, homeless: true } : null, 10, 2, economy).consumed, "homeless can eat owned food");
+assert(consume({ cooldowns: {}, results: [] }, { id: "jobless", money: 0, inventory: { bread: 1 }, profession: "citizen" }, 12, 2, economy).consumed, "unemployed can eat");
+assert(consume({ cooldowns: {}, results: [] }, { id: "urgent", money: 0, inventory: { bread: 1 } }, 10, 3, economy).reason === "daily_meal", "emergency hunger still uses meal path");
+store.cooldowns = {};
+assert(store.cooldowns.v1 == null, "daily reset");
+const migrated = { version: 11, food: { householdCooldowns: { h1: 1 } }, consumption: { citizenCooldowns: {}, recentResults: [] }, money: 20 };
+assert(migrated.version === 11 && migrated.food.householdCooldowns.h1 === 1 && migrated.money === 20, "v10 to v11 migration");
+store.results = Array.from({ length: 240 }, (_, i) => i).slice(-200);
+assert(store.results.length === 200, "result history cap");
+const bought = { inventory: { bread: 0 }, money: 16 };
+bought.inventory.bread += 1; bought.money -= 8;
+const demandBefore = economy.demand.bread;
+const after = consume({ cooldowns: {}, results: [] }, { id: "loop", money: bought.money, inventory: bought.inventory }, 25, 6, economy);
+assert(after.consumed && bought.inventory.bread === 0 && economy.demand.bread === demandBefore + 1, "purchase then consumption loop");
+console.log(failed ? `${failed} failed` : `\nAll ${passed} consumption tests passed.`);
+process.exit(failed ? 1 : 0);

@@ -7,7 +7,7 @@ import { purchaseGoods } from "../economy/transactions.js";
 import { getAllShops, getShopPrice } from "../economy/shops.js";
 import { getGood } from "../economy/goods-registry.js";
 
-export const FOOD_GOOD_ID = "wheat";
+export const FOOD_GOOD_ID = "bread";
 export const HUNGER_THRESHOLD = 35;
 export const MAX_FOOD_PER_DAY = 10;
 export const MAX_FOOD_RESULTS = 200;
