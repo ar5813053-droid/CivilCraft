@@ -170,3 +170,10 @@ Each phase should ship with:
 2. Modular systems that do not break prior phases
 3. Documentation updates
 4. Performance review against mobile targets
+
+## Phase 9 — Citizen Daily Life ✅
+
+- Activity states and routines
+- Needs, happiness, stress
+- Attendance aggregates
+- No pathfinding

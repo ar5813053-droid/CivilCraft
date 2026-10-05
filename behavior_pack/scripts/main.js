@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 8 Housing & Population).
+ * CivilCraft — entry point (Phase 9 Daily Life).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -56,8 +56,10 @@ import { typeForPopulation } from "./settlements/settlement-types.js";
 import { initializeInfrastructure, formatInfraLines, getInfrastructure } from "./infrastructure/infrastructure-manager.js";
 import { initializeHousing, formatHousingLines, getHousing } from "./housing/housing-manager.js";
 import { initializePopulation, formatPopulationLines, getPopulationStore } from "./population/population-manager.js";
+import { initializeDailyLife, formatDailyLines, getDailyLife } from "./dailylife/daily-life-manager.js";
+import { ROUTINES } from "./dailylife/routines.js";
 
-Logger.info("CivilCraft Phase 8 loading…");
+Logger.info("CivilCraft Phase 9 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -74,6 +76,7 @@ initializeSettlements();
 initializeInfrastructure();
 initializeHousing();
 initializePopulation();
+initializeDailyLife();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -616,6 +619,24 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           player.sendMessage(`§7Migrations ${getPopulationStore().migrations.length}`);
           break;
 
+        case "daily":
+        case "activity":
+        case "needs":
+        case "happiness":
+        case "stress": {
+          const lines = formatDailyLines(args[1]);
+          for (const line of lines) player.sendMessage(line);
+          break;
+        }
+
+        case "attendance":
+          player.sendMessage(`§7Attendance rows ${getDailyLife().attendance.length}`);
+          break;
+
+        case "routines":
+          player.sendMessage(ROUTINES.join(", "));
+          break;
+
         default:
           player.sendMessage("§cUnknown command. Try !cc help");
       }
@@ -628,4 +649,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 8 ready.");
+Logger.info("CivilCraft Phase 9 ready.");

@@ -220,3 +220,7 @@ Records are keyed by villagerId. Treatment uses medical_expense or a treasury su
 ## Housing & Population (Phase 8)
 
 Households reference villager ids. Houses may have null locations. Population manager is the settlement population source. Demographics advance in batches of 40 about every 3 minutes. Housing condition decays on a similar interval. New citizens from createVillagerProfile are simulated records. Death updates records only and is not triggered by low health. World data version is 8.
+
+## Daily Life (Phase 9)
+
+Daily life owns activity, behavioral needs, happiness, stress, attendance aggregates, and cooldowns. Priority is emergency, healthcare, food, sleep, school/work, then leisure. Police and clinic schedules are not replaced. World data version is 9. Batch size is 40.
