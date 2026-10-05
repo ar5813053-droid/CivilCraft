@@ -204,3 +204,7 @@ reportViolation (cooldown per villager+law)
 ```
 
 Public Safety department remains disabled. Tax evasion is a law definition only; tax collection is unchanged. World data version is 4. `normalizeJustice()` bounds lists and fills missing fields without clearing economy or government.
+
+## Police & Emergency (Phase 5)
+
+Public Safety is enabled on municipal_main. Officers reference villager ids. reportCrime calls justice.reportViolation. Salaries use transferMoney type government_salary and fail into unpaidSalaries if the treasury is short. Patrols and dispatch are interval records, not pathfinding. World data version is 5.

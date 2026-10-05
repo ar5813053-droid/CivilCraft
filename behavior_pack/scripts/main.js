@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 4 Laws & Justice).
+ * CivilCraft — entry point (Phase 5 Police & Emergency).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -39,8 +39,13 @@ import {
   getLegalStatus
 } from "./justice/justice-manager.js";
 import { issueFine } from "./justice/penalties.js";
+import { initializePolice, formatPoliceLines, getPolice } from "./police/police-manager.js";
+import { hireOfficer, getOfficerByVillager } from "./police/officers.js";
+import { setRank, getAllRanks } from "./police/ranks.js";
+import { reportCrime } from "./police/arrests.js";
+import { initializeEmergency, formatEmergencyLines, getEmergencyStore, createEmergency } from "./emergency/emergency-manager.js";
 
-Logger.info("CivilCraft Phase 4 loading…");
+Logger.info("CivilCraft Phase 5 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -49,6 +54,8 @@ initializeSchedules();
 initializeEconomy();
 initializeGovernment();
 initializeJustice();
+initializePolice();
+initializeEmergency();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -98,6 +105,12 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           );
           player.sendMessage(
             "§6Justice:§r justice laws law violations cases case legal fine justiceevents"
+          );
+          player.sendMessage(
+            "§6Police:§r police officers officer stations patrols arrests policeevents"
+          );
+          player.sendMessage(
+            "§6Emergency:§r dispatch emergencies emergency"
           );
           break;
 
@@ -368,6 +381,73 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           break;
         }
 
+        case "police": {
+          if (args[1] === "hire") {
+            const id = args[2] || getAllVillagers()[0]?.id;
+            const result = id ? hireOfficer(getPolice(), id, "recruit") : { ok: false, error: "no_villager" };
+            player.sendMessage(result.ok ? `§aHired ${id}` : `§c${result.error}`);
+            break;
+          }
+          if (args[1] === "rank") {
+            const officer = getOfficerByVillager(getPolice(), args[2]);
+            const result = setRank(officer, args[3]);
+            player.sendMessage(result.ok ? `§aRank ${args[3]}` : `§c${result.error}`);
+            break;
+          }
+          if (args[1] === "report") {
+            const officer = getPolice().officers[0];
+            const result = officer
+              ? reportCrime(getPolice(), { officerId: officer.officerId, lawId: args[3] || "theft", offenderVillagerId: args[2] })
+              : { ok: false, error: "no_officer" };
+            player.sendMessage(result.ok ? "§aReported" : `§c${result.error}`);
+            break;
+          }
+          for (const line of formatPoliceLines()) player.sendMessage(line);
+          break;
+        }
+
+        case "officers":
+          player.sendMessage(getPolice().officers.map((o) => `${o.villagerId}:${o.rank}`).join(", ") || "§7None");
+          break;
+
+        case "officer": {
+          const officer = getOfficerByVillager(getPolice(), args[1]);
+          player.sendMessage(officer ? `${officer.rank} ${officer.status}` : "§cNo officer");
+          break;
+        }
+
+        case "stations":
+          player.sendMessage(getPolice().stations.map((s) => s.name).join(", ") || "§7None");
+          break;
+
+        case "patrols":
+          player.sendMessage(getPolice().patrols.map((p) => `${p.patrolId}:${p.status}`).join(", ") || "§7None");
+          break;
+
+        case "arrests":
+          player.sendMessage(String(getPolice().arrests.length));
+          break;
+
+        case "policeevents":
+          player.sendMessage(getPolice().events.slice(-6).map((e) => e.type).join(", ") || "§7None");
+          break;
+
+        case "dispatch":
+        case "emergencies":
+          for (const line of formatEmergencyLines()) player.sendMessage(line);
+          break;
+
+        case "emergency": {
+          if (args[1] === "create") {
+            const result = createEmergency(getEmergencyStore(), { type: args[2] || "crime", priority: "normal" });
+            player.sendMessage(result.ok ? `§a${result.emergency.emergencyId} ${result.emergency.status}` : `§c${result.error}`);
+            break;
+          }
+          const found = getEmergencyStore().emergencies.find((e) => e.emergencyId === args[1]);
+          player.sendMessage(found ? `${found.type} ${found.status}` : "§cNo emergency");
+          break;
+        }
+
         default:
           player.sendMessage("§cUnknown command. Try !cc help");
       }
@@ -380,4 +460,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 4 ready.");
+Logger.info("CivilCraft Phase 5 ready.");

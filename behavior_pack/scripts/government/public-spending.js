@@ -14,7 +14,8 @@ import { Logger } from "../core/logger.js";
 const ACTIVE_CATEGORIES = [
   BudgetCategory.PUBLIC_WORKS,
   BudgetCategory.ADMINISTRATION,
-  BudgetCategory.RESERVE
+  BudgetCategory.RESERVE,
+  "public_safety"
 ];
 
 /**
@@ -31,18 +32,25 @@ export function allocateBudget(govId) {
   const earmarked =
     sanitizeMoney(gov.budget.public_works) +
     sanitizeMoney(gov.budget.administration) +
-    sanitizeMoney(gov.budget.reserve);
+    sanitizeMoney(gov.budget.reserve) +
+    sanitizeMoney(gov.budget.public_safety);
   const free = Math.max(0, sanitizeMoney(gov.treasury.balance) - earmarked);
   if (free <= 0) return { ok: true, allocated: 0 };
 
-  const works = Math.floor(free * 0.4);
-  const admin = Math.floor(free * 0.2);
-  const reserve = free - works - admin;
+  const works = Math.floor(free * 0.35);
+  const admin = Math.floor(free * 0.15);
+  const safety = Math.floor(free * 0.2);
+  const reserve = free - works - admin - safety;
   gov.budget.public_works = sanitizeMoney(gov.budget.public_works + works);
   gov.budget.administration = sanitizeMoney(gov.budget.administration + admin);
+  gov.budget.public_safety = sanitizeMoney((gov.budget.public_safety || 0) + safety);
   gov.budget.reserve = sanitizeMoney(gov.budget.reserve + reserve);
   gov.departments.public_works.budgetAllocation = gov.budget.public_works;
   gov.departments.finance.budgetAllocation = gov.budget.administration;
+  if (gov.departments.public_safety) {
+    gov.departments.public_safety.budgetAllocation = gov.budget.public_safety;
+    gov.departments.public_safety.enabled = true;
+  }
   markDirty();
   return { ok: true, allocated: free };
 }

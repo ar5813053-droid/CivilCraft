@@ -67,7 +67,18 @@
 - Court proceedings (lightweight)
 - Sentences & prisons
 
-## Phase 5 — Police & Emergency
+## Phase 5 — Police & Emergency ✅
+
+- Public Safety department active
+- Officer job, ranks, station and patrol records
+- Crime reports through Phase 4
+- Arrest records only (no prisons)
+- Emergency dispatch and police units
+- Treasury-funded salaries
+
+---
+
+## Phase 5 notes
 
 - Guard / police jobs
 - Patrol schedules

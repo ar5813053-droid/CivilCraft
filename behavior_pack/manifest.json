@@ -2,11 +2,11 @@
   "format_version": 2,
   "header": {
     "name": "CivilCraft Behavior Pack",
-    "description": "Living Village, Economy, Government, and Laws & Justice. Phase 4 of CivilCraft.",
+    "description": "CivilCraft Phase 5: Police and Emergency foundation.",
     "uuid": "2a27c2cc-b7d6-4ac4-9637-95c770a6d3be",
     "version": [
       1,
-      3,
+      4,
       0
     ],
     "min_engine_version": [
@@ -42,7 +42,7 @@
       "uuid": "9296565a-743a-4368-9426-d469027a5956",
       "version": [
         1,
-        3,
+        4,
         0
       ]
     },
