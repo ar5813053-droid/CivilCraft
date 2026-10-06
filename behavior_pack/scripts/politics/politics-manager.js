@@ -8,6 +8,8 @@ import { applyRulingPolicy } from "./policies.js";
 import { seedCandidates } from "./candidate-seeding.js";
 import { getGovernment } from "../government/leadership.js";
 import { reportEvent } from "../social/media.js";
+import { publish } from "../events/event-bus.js";
+import { EventType } from "../events/event-types.js";
 
 export const POLITICS_INTERVAL_TICKS = 2400;
 let initialized = false;
@@ -59,6 +61,7 @@ export function processPolitics(data) {
         registerElectionCandidate(election, c.id);
       }
       pushEvent(store, "election_scheduled", election.id);
+      publish(EventType.ELECTION_STARTED, { source: "politics", metadata: { electionId: election.id } });
       if (data.social) reportEvent(data.social, { type: "government_notice", headlineKey: "election_announced", severity: 2 });
     }
   }
@@ -88,6 +91,7 @@ export function processPolitics(data) {
         applyRulingPolicy(store, gov, gov.rulingPartyId);
         store.stats.electionsHeld = (store.stats.electionsHeld || 0) + 1;
         pushEvent(store, "election_completed", counted.winnerId);
+        publish(EventType.ELECTION_COMPLETED, { source: "politics", metadata: { winnerId: counted.winnerId, electionId: election.id } });
         if (data.social) reportEvent(data.social, { type: "government_notice", headlineKey: "election_result", severity: 3 });
       } else {
         pushEvent(store, "election_no_candidate", election.id);

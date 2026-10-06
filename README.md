@@ -311,3 +311,7 @@ Players receive a CivilCraft profile (wallet + bank account). Commands: `!cc pro
 - **AI** — deterministic personalities and goals (batched)
 - **Score 2.0** — component breakdown + reasons
 - World data version **24**
+
+## Milestone 1 — Memory & Event Bus
+
+Typed event bus (`publish` / `subscribe` / `flushEventBus`) and bounded citizen/civilization memory. Player job start/end and mission completion publish events; memory records important types only.

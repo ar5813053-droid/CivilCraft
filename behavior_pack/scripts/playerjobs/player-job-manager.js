@@ -10,6 +10,8 @@ import { createDefaultPlayerJobs, normalizePlayerJobs } from "./player-job-data.
 import { generateMissionsForJob, acceptMission, abandonMission, completeMission } from "./job-missions.js";
 import { payMissionReward, tryWeeklyPayroll, salaryHint } from "./player-payroll.js";
 import { getAllShops } from "../economy/shops.js";
+import { publish } from "../events/event-bus.js";
+import { EventType } from "../events/event-types.js";
 
 let initialized = false;
 export const PLAYER_JOB_INTERVAL = 2400;
@@ -112,6 +114,11 @@ export function applyForJob(profile, jobId) {
   if (result.ok) {
     profile.jobId = jobId;
     profile.employmentId = profile.id;
+    publish(EventType.PLAYER_JOB_STARTED, {
+      source: "playerjobs",
+      actorId: profile.id,
+      metadata: { jobId, employerId: result.record?.employerId }
+    });
     markDirty();
   }
   return result;
@@ -123,6 +130,13 @@ export function quitJob(profile) {
   const day = Math.floor(Date.now() / 86400000);
   const r = makeUnemployed(store, profile.id, day, "resigned");
   profile.jobId = null;
+  if (r.ok) {
+    publish(EventType.PLAYER_JOB_ENDED, {
+      source: "playerjobs",
+      actorId: profile.id,
+      metadata: { reason: "resigned" }
+    });
+  }
   markDirty();
   return r;
 }

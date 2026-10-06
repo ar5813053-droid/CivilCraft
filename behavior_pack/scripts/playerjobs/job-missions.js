@@ -2,6 +2,8 @@ import { MISSION_STATUSES, MAX_MISSIONS } from "./player-job-data.js";
 import { getQty, addItem, ensureInventory } from "../economy/inventory.js";
 import { getShop } from "../economy/shops.js";
 import { markDirty } from "../core/data-store.js";
+import { publish } from "../events/event-bus.js";
+import { EventType } from "../events/event-types.js";
 
 let missionSeq = 0;
 
@@ -236,6 +238,12 @@ export function completeMission(store, playerId, missionId, profile, data, payFn
       perf.salaryEarned = (perf.salaryEarned || 0) + m.reward;
     }
   }
+
+  publish(EventType.PLAYER_MISSION_COMPLETED, {
+    source: "playerjobs",
+    actorId: playerId,
+    metadata: { missionId: m.id, jobId: m.jobId, type: m.type, reward: m.reward }
+  });
 
   markDirty();
   return { ok: true, mission: m, reward: m.reward };

@@ -2,6 +2,9 @@ import { system } from "@minecraft/server";
 import { Logger } from "../core/logger.js";
 import { getWorldData, markDirty } from "../core/data-store.js";
 import { createDefaultMemory, normalizeMemory, MAX_CITIZEN_MEMORIES, MAX_CIV_MEMORIES } from "./memory-data.js";
+import { wireMemorySubscriber } from "./memory-subscriber.js";
+export { addCitizenMemory, getCitizenMemories } from "./citizen-memory.js";
+export { addCivilizationMemory, getCivilizationMemories } from "./civilization-memory.js";
 
 let initialized = false;
 
@@ -10,6 +13,7 @@ export function initializeMemory() {
   initialized = true;
   const data = getWorldData();
   data.memory = data.memory ? normalizeMemory(data.memory) : createDefaultMemory();
+  wireMemorySubscriber();
   Logger.info("Memory manager initialized.");
 }
 
