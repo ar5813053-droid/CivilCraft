@@ -1,0 +1,37 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "civilcraft:citizen",
+      "materials": { "default": "villager_v2" },
+      "textures": {
+        "civilian": "textures/civilcraft/roles/civilcraft_civilian",
+        "farmer": "textures/civilcraft/roles/civilcraft_farmer",
+        "worker": "textures/civilcraft/roles/civilcraft_worker",
+        "builder": "textures/civilcraft/roles/civilcraft_builder",
+        "trader": "textures/civilcraft/roles/civilcraft_trader",
+        "doctor": "textures/civilcraft/roles/civilcraft_doctor",
+        "nurse": "textures/civilcraft/roles/civilcraft_nurse",
+        "teacher": "textures/civilcraft/roles/civilcraft_teacher",
+        "police": "textures/civilcraft/roles/civilcraft_police",
+        "emergency": "textures/civilcraft/roles/civilcraft_emergency",
+        "mayor": "textures/civilcraft/roles/civilcraft_mayor",
+        "leader": "textures/civilcraft/roles/civilcraft_leader",
+        "soldier": "textures/civilcraft/roles/civilcraft_soldier",
+        "student": "textures/civilcraft/roles/civilcraft_student",
+        "civilian_a": "textures/civilcraft/roles/civilcraft_civilian_a",
+        "civilian_b": "textures/civilcraft/roles/civilcraft_civilian_b",
+        "civilian_c": "textures/civilcraft/roles/civilcraft_civilian_c",
+        "civilian_d": "textures/civilcraft/roles/civilcraft_civilian_d"
+      },
+      "geometry": {
+        "default": "geometry.villager.v2.masked"
+      },
+      "render_controllers": ["controller.render.civilcraft_citizen"],
+      "spawn_egg": {
+        "base_color": "#6B8E23",
+        "overlay_color": "#8B7355"
+      }
+    }
+  }
+}

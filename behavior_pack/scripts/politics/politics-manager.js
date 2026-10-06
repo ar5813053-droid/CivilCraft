@@ -5,6 +5,7 @@ import { createDefaultPolitics, normalizePolitics, ELECTION_TERM_DAYS, CAMPAIGN_
 import { createElection, startCampaign, countVotes, installWinner, processVoterBatch, registerElectionCandidate } from "./elections.js";
 import { initPreferences } from "./political-preferences.js";
 import { applyRulingPolicy } from "./policies.js";
+import { seedCandidates } from "./candidate-seeding.js";
 import { getGovernment } from "../government/leadership.js";
 import { reportEvent } from "../social/media.js";
 
@@ -43,6 +44,10 @@ export function processPolitics(data) {
   const day = Math.floor(Date.now() / 86400000);
   const gov = getGovernment();
   if (!gov) return;
+
+  // Auto-seed candidates (bounded)
+  const villagerList = Object.values(data.villagers || {});
+  seedCandidates(store, villagerList, {});
 
   let election = [...store.elections].reverse().find((e) => e.status !== "completed");
   if (!election) {

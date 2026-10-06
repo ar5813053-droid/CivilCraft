@@ -256,3 +256,7 @@ nation_main wraps existing settlement/government. Relations -100..100. Treaties 
 ## Phase 20 — Advanced Civilization
 
 Civilization manager aggregates employment, housing, food, health, education, utilities, approval, and prosperity into a 0–100 score. World events fire only from thresholds with multi-day cooldowns. Appearance keys map jobs to original resource-pack textures. Simulation tiers FULL/LIGHT/BACKGROUND orchestrate intensity without replacing Daily Life.
+
+## Phase 21
+
+Appearance: civilcraft:citizen uses synced int property role_index (0–17) selected by employment/leadership. Render controller Array.skins maps index to textures. Legacy tryFeedVillager does not mutate hunger. Candidate seeding and trade automation run on politics/nations intervals.

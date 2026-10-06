@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 20 Advanced Civilization).
+ * CivilCraft — entry point (Phase 21 Final Civilization).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -72,13 +72,14 @@ import { initializePolitics, getPoliticsStore } from "./politics/politics-manage
 import { listParties } from "./politics/parties.js";
 import { initializeNations, getNationsStore } from "./nations/nation-manager.js";
 import { initializeCivilization, getCivilizationStore, formatCivilizationLines } from "./civilization/civilization-manager.js";
+import { initializeAppearance } from "./appearance/appearance-manager.js";
 import { selectAppearance } from "./civilization/appearance.js";
 import { listNations, getNation } from "./nations/nation-registry.js";
 import { getRelation } from "./nations/diplomacy.js";
 import { getShop, getAllShops } from "./economy/shops.js";
 import { getAllJobs } from "./jobs/job-registry.js";
 
-Logger.info("CivilCraft Phase 20 loading…");
+Logger.info("CivilCraft Phase 21 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -105,6 +106,7 @@ initializeSocial();
 initializePolitics();
 initializeNations();
 initializeCivilization();
+initializeAppearance();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -687,6 +689,14 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
 
 
 
+        case "validate": {
+          const civ = getCivilizationStore();
+          const data = getWorldData();
+          player.sendMessage(`§6Validate§r v${data.version || "?"} score ${civ.score}`);
+          player.sendMessage(`pop ${Object.keys(data.villagers||{}).length} events ${civ.events.length}`);
+          player.sendMessage(`emp ${data.employment?.stats?.employed||0} shops ${(data.economy&&data.economy.shops)?Object.keys(data.economy.shops).length:0}`);
+          break;
+        }
         case "civilization":
         case "world": {
           for (const line of formatCivilizationLines()) player.sendMessage(line);
@@ -840,4 +850,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 20 ready.");
+Logger.info("CivilCraft Phase 21 ready.");

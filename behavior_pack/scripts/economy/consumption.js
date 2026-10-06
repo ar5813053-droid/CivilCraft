@@ -29,10 +29,20 @@ const HUNGER_DRAIN = 1;
  * @param {import("../villagers/villager-identity.js").VillagerRecord} record
  * @returns {{ fed: boolean, method?: string }}
  */
+/**
+ * Legacy economy feed path (Phase 2, 0–20 scale).
+ * Phase 9–11 Daily Life owns hunger on 0–100. This function is a no-op
+ * for hunger mutation to avoid dual models. Prefer dailylife/consumption.js.
+ */
 export function tryFeedVillager(record) {
-  if (!record) return { fed: false };
+  if (!record) return { fed: false, skipped: true, reason: "daily_life_authoritative" };
 
-  // Light drain
+  // Do not mutate hunger (0–20 legacy). Daily Life is authoritative (0–100).
+  if (true) {
+    return { fed: false, skipped: true, reason: "daily_life_authoritative" };
+  }
+
+  // Unreachable legacy body retained for reference structure:
   if (record.currentActivity !== "sleep") {
     record.hunger = clamp((record.hunger ?? 20) - HUNGER_DRAIN, 0, 20);
   }

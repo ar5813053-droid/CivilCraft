@@ -16,3 +16,13 @@ All Phase 20 visual assets under `resource_pack/textures/civilcraft/` are **orig
 - No scraped assets from the internet
 
 Role textures are **placeholder color-coded skins** for deterministic role mapping until higher-detail original art is added. They are not copies of Mojang or Marketplace content.
+
+## Phase 21 entity / render
+
+| Asset | Source | Author | License |
+|-------|--------|--------|---------|
+| `behavior_pack/entities/civilcraft_citizen.json` | Original | CivilCraft Team | MIT |
+| `resource_pack/entity/civilcraft_citizen.entity.json` | Original | CivilCraft Team | MIT |
+| `resource_pack/render_controllers/civilcraft_citizen.render_controllers.json` | Original | CivilCraft Team | MIT |
+
+Role PNGs remain original solid-color markers (32×32). Geometry uses Bedrock built-in `geometry.villager.v2.masked` reference (not redistributed).

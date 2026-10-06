@@ -102,6 +102,13 @@ const required = [
   "behavior_pack/scripts/civilization/world-events.js",
   "behavior_pack/scripts/civilization/simulation-tiers.js",
   "behavior_pack/scripts/civilization/appearance.js",
+  "behavior_pack/scripts/appearance/appearance-manager.js",
+  "behavior_pack/scripts/politics/candidate-seeding.js",
+  "behavior_pack/scripts/nations/trade-automation.js",
+  "behavior_pack/entities/civilcraft_citizen.json",
+  "resource_pack/entity/civilcraft_citizen.entity.json",
+  "resource_pack/render_controllers/civilcraft_citizen.render_controllers.json",
+
   "assets/LICENSES.md",
 
 

@@ -3,6 +3,7 @@ import { Logger } from "../core/logger.js";
 import { getWorldData, markDirty } from "../core/data-store.js";
 import { createDefaultNations, normalizeNations } from "./nation-data.js";
 import { expireTreaties } from "./diplomacy.js";
+import { autoMatchTrade } from "./trade-automation.js";
 
 export const NATIONS_INTERVAL_TICKS = 2400;
 let initialized = false;
@@ -36,6 +37,7 @@ function processNations(data) {
   if (!store) return;
   const day = Math.floor(Date.now() / 86400000);
   expireTreaties(store, day);
+  autoMatchTrade(store, day);
   const main = store.nations.find((n) => n.id === "nation_main");
   if (main) main.population = Object.keys(data.villagers || {}).length;
   store.stats.nations = store.nations.length;
