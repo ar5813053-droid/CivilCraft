@@ -75,6 +75,7 @@ import { initializeCivilization, getCivilizationStore, formatCivilizationLines }
 import { initializeAppearance } from "./appearance/appearance-manager.js";
 import { initializeBanking, getBankingStore, openAccount, deposit, withdraw, transfer, getAccount, statementLines } from "./banking/banking-manager.js";
 import { initializePlayerSystem, getOrCreateProfile, formatProfile, playerBuy, playerSell, getPlayersStore } from "./player/player-manager.js";
+import { initializePlayerJobs, listAvailableJobs, listNearbyEmployers, applyForJob, quitJob, jobStatus, playerMissions, doAcceptMission, doCompleteMission, doAbandonMission, getPlayerJobsStore } from "./playerjobs/player-job-manager.js";
 import { getBalance } from "./economy/wallet.js";
 import { getAllShops } from "./economy/shops.js";
 import { selectAppearance } from "./civilization/appearance.js";
@@ -113,6 +114,7 @@ initializeCivilization();
 initializeAppearance();
 initializeBanking();
 initializePlayerSystem();
+initializePlayerJobs();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -751,9 +753,67 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           break;
         }
         case "jobs":
-        case "job":
-          player.sendMessage("§7Use employment system: !cc employment | job status via profile");
+        case "job": {
+          const pr = getOrCreateProfile(player);
+          const sub = (args[1] || "available").toLowerCase();
+          if (sub === "available" || sub === "list" || args[0] === "jobs" && !args[1]) {
+            for (const j of listAvailableJobs().slice(0, 15)) {
+              player.sendMessage(`${j.id} — ${j.name} ~${j.salaryHint}₡`);
+            }
+          } else if (sub === "nearby") {
+            for (const e of listNearbyEmployers().slice(0, 12)) {
+              player.sendMessage(`${e.jobId} @ ${e.label} open ${e.open} ~${e.salaryHint}₡`);
+            }
+          } else if (sub === "info") {
+            const j = listAvailableJobs().find((x) => x.id === args[2]);
+            player.sendMessage(j ? `${j.id}: ${j.description || j.name}` : "§cUnknown job");
+          } else if (sub === "apply") {
+            const r = applyForJob(pr, args[2]);
+            player.sendMessage(r.ok ? `§aHired as ${args[2]}` : `§c${r.error}`);
+          } else if (sub === "status") {
+            const st = jobStatus(pr);
+            player.sendMessage(`${st.status} ${st.jobId || ""} emp ${st.employerId || "-"}`);
+          } else if (sub === "quit") {
+            const r = quitJob(pr);
+            player.sendMessage(r.ok ? "§aResigned" : `§c${r.error || "not employed"}`);
+          } else if (sub === "missions") {
+            for (const m of playerMissions(pr.id).slice(0, 10)) {
+              player.sendMessage(`${m.id} ${m.status} ${m.type} reward ${m.reward}`);
+            }
+          } else {
+            player.sendMessage("§e!cc jobs|jobs nearby|job apply <id>|job status|job quit|job missions");
+          }
           break;
+        }
+        case "mission": {
+          const pr = getOrCreateProfile(player);
+          const sub = (args[1] || "status").toLowerCase();
+          if (sub === "accept") {
+            const r = doAcceptMission(pr.id, args[2]);
+            player.sendMessage(r.ok ? "§aAccepted" : `§c${r.error}`);
+          } else if (sub === "complete") {
+            const r = doCompleteMission(pr, args[2]);
+            player.sendMessage(r.ok ? `§aDone +${r.reward}₡` : `§c${r.error}`);
+          } else if (sub === "abandon") {
+            const r = doAbandonMission(pr.id, args[2]);
+            player.sendMessage(r.ok ? "§aAbandoned" : `§c${r.error}`);
+          } else {
+            for (const m of playerMissions(pr.id).slice(0, 8)) {
+              player.sendMessage(`${m.id} ${m.status}`);
+            }
+          }
+          break;
+        }
+        case "career":
+        case "salary":
+        case "work": {
+          const pr = getOrCreateProfile(player);
+          const st = jobStatus(pr);
+          const perf = getPlayerJobsStore().performance[pr.id];
+          player.sendMessage(`Job ${st.jobId || "none"} salary~${st.salaryHint}`);
+          if (perf) player.sendMessage(`Missions ${perf.missionsCompleted || 0} earned ${perf.salaryEarned || 0}`);
+          break;
+        }
         case "housing":
           player.sendMessage("§7Housing via !cc population / existing housing records");
           break;

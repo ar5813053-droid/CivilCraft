@@ -5,7 +5,7 @@
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
 > **Current status:** Phase 21 — Final Civilization  
-> Version: `1.22.0`  
+> Version: `1.23.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -225,6 +225,7 @@ node tests/phase21/resource-pack.test.js
 node tests/banking/banking.test.js
 node tests/player/player-citizen.test.js
 node tests/player/player-economy.test.js
+node tests/playerjobs/player-jobs.test.js
 ```
 
 Static/structure tests only — in-game behavior requires a Bedrock client.
@@ -296,3 +297,7 @@ Derived civilization score, world events with cooldowns, simulation tiers, and *
 ## Player Citizen & Banking
 
 Players receive a CivilCraft profile (wallet + bank account). Commands: `!cc profile`, `!cc bank deposit|withdraw|transfer|statement`, `!cc shop list|buy|sell`. Fully-backed bank deposits. World data version **22**.
+
+## Player Jobs & Missions
+
+`!cc jobs`, `!cc job apply <id>`, `!cc job missions`, `!cc mission accept|complete`. Missions affect shop stock, cases, health, education. Salary/rewards paid from employer funds only. World data **23**.

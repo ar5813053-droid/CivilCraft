@@ -264,3 +264,7 @@ Appearance: civilcraft:citizen uses synced int property role_index (0–17) sele
 ## Player & Banking
 
 Player profiles mirror citizen wallets using Economy credit/debit. Bank accounts are separate balances with liquidity tracking (fully-backed). Purchases call purchaseGoods. No second currency.
+
+## Player Jobs
+
+hireCitizen accepts player profile ids. Missions generated from shops/justice/healthcare state. completeMission mutates inventories/cases; payMissionReward debits employer.
