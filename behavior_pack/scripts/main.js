@@ -78,7 +78,7 @@ import { initializePlayerSystem, getOrCreateProfile, formatProfile, playerBuy, p
 import { initializePlayerJobs, listAvailableJobs, listNearbyEmployers, applyForJob, quitJob, jobStatus, playerMissions, doAcceptMission, doCompleteMission, doAbandonMission, getPlayerJobsStore } from "./playerjobs/player-job-manager.js";
 import { initializeMemory, listCivilizationMemories } from "./memory/memory-manager.js";
 import { initializeEvents, getEventsStore, scheduleEvent } from "./events/event-manager.js";
-import { initializeCulture, getCultureStore } from "./culture/festival-manager.js";
+import { initializeCulture, getCultureStore, listActiveFestivals, listUpcomingFestivals, playerJoinFestival, playerLeaveFestival, cancelFestival, cultureStats, listFestivals, getFestival } from "./culture/culture-manager.js";
 import { initializeAi, getAiStore } from "./ai/behavior-engine.js";
 import { initializeCitizenAi } from "./citizenai/citizen-ai-manager.js";
 import { initializeWorldEvents, getWorldEventsStore, listActiveEvents, listUpcoming, getEventInfo, playerJoinEvent, playerLeaveEvent, calendarLines, scheduleManual, cancelEvent } from "./worldevents/world-event-manager.js";

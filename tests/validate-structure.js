@@ -138,6 +138,12 @@ const required = [
   "behavior_pack/scripts/events/event-data.js",
   "behavior_pack/scripts/events/event-manager.js",
   "behavior_pack/scripts/culture/culture-data.js",
+  "behavior_pack/scripts/culture/festival-registry.js",
+  "behavior_pack/scripts/culture/cultural-preferences.js",
+  "behavior_pack/scripts/culture/festival-economy.js",
+  "behavior_pack/scripts/culture/festival-activities.js",
+  "behavior_pack/scripts/culture/culture-manager.js",
+
   "behavior_pack/scripts/culture/festival-manager.js",
   "behavior_pack/scripts/ai/personality-data.js",
   "behavior_pack/scripts/ai/behavior-engine.js",

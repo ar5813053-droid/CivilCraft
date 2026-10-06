@@ -5,7 +5,7 @@
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
 > **Current status:** Phase 21 — Final Civilization  
-> Version: `1.26.0`  
+> Version: `1.27.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -323,3 +323,7 @@ Deterministic traits, bounded goals (max 3), decision scoring that cannot overri
 ## Milestone 3 — World Event Engine (COMPLETE)
 
 Full calendar (120-day year), event registry, lifecycle scheduled→preparation→active→closing→completed, participants, idempotent effects (demand, happiness, opinion, media, memory, event bus). Commands: `!cc calendar`, `!cc events`, `!cc event join|leave|info`. Schema **26**.
+
+## Milestone 4 — Festivals & Culture (COMPLETE)
+
+Christmas, Diwali, Holi, Ramadan, Eid + harvest. Culture schedules via world calendar, real `recordDemand`, happiness, media, memory, Event Bus. Player: `!cc festivals`, `!cc festival join`. Schema **27**.
