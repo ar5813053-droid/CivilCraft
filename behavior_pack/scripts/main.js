@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 13 Business Operations).
+ * CivilCraft — entry point (Phases 14-17 Civilization Systems).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -62,10 +62,16 @@ import { getHouseholdFoodStatus, evaluateHouseholdFood } from "./dailylife/food.
 import { evaluateCitizenConsumption, getConsumptionStatus } from "./dailylife/consumption.js";
 import { initializeEmployment, formatEmploymentLines, getEmploymentStore, hireCitizen } from "./employment/employment-manager.js";
 import { initializeBusinessOperations, formatBusinessLines, runShopPayroll, ensureBusinessOps, getVacancies } from "./economy/business-operations.js";
+import { initializeBusinessProduction } from "./economy/business-production.js";
+import { initializeLogistics, getLogisticsStore } from "./logistics/logistics-manager.js";
+import { createRoute } from "./logistics/routes.js";
+import { createShipment } from "./logistics/shipments.js";
+import { initializeUtilities, getUtilitiesStore } from "./utilities/utilities-manager.js";
+import { initializeSocial, getSocialStore } from "./social/social-manager.js";
 import { getShop, getAllShops } from "./economy/shops.js";
 import { getAllJobs } from "./jobs/job-registry.js";
 
-Logger.info("CivilCraft Phase 13 loading…");
+Logger.info("CivilCraft Phases 14-17 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -85,6 +91,10 @@ initializePopulation();
 initializeDailyLife();
 initializeEmployment();
 initializeBusinessOperations();
+initializeBusinessProduction();
+initializeLogistics();
+initializeUtilities();
+initializeSocial();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -664,6 +674,18 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
 
 
 
+
+        case "logistics":
+          player.sendMessage(`§7Routes ${getLogisticsStore().routes.length} shipments ${getLogisticsStore().shipments.length}`);
+          break;
+        case "utilities":
+          player.sendMessage(`§7Utility quality ${getUtilitiesStore().stats.averageQuality}`);
+          break;
+        case "opinion":
+        case "social":
+          player.sendMessage(`§7Approval ${getSocialStore().opinion.governmentApproval} economy ${getSocialStore().opinion.economicConfidence}`);
+          break;
+
         case "business": {
           if (args[1] === "payroll" && args[2]) {
             const shop = getShop(args[2]);
@@ -764,4 +786,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 13 ready.");
+Logger.info("CivilCraft Phases 14-17 ready.");

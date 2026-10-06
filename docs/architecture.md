@@ -240,3 +240,7 @@ Employment owns assignment state only. Jobs own definitions and schedules. Educa
 ## Business Operations (Phase 13)
 
 Existing shops are the private employers. Capacity is by type (food 5, general 4, etc.). Sales through purchaseGoods increase shop revenue. Maintenance is a small daily debit. Private payroll runs every 7 simulated days via transferMoney and never pays government or police roles. World data version is 13.
+
+## Phases 14–17
+
+Production uses shared recipes and shop employees. Logistics moves goods between shops with travel days. Utilities compute settlement service quality. Social opinion is smoothed from employment, safety, health, education, and utilities. World data version is 17.

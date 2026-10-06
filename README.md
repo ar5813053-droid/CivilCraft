@@ -4,8 +4,8 @@
 
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
-> **Current status:** Phase 13 — Business Operations  
-> Version: `1.12.0`  
+> **Current status:** Phases 14–17 — Production, Logistics, Utilities, Social  
+> Version: `1.16.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -213,6 +213,10 @@ node tests/dailylife/food.test.js
 node tests/dailylife/consumption.test.js
 node tests/employment/employment.test.js
 node tests/economy/business-operations.test.js
+node tests/economy/production-business.test.js
+node tests/logistics/logistics.test.js
+node tests/utilities/utilities.test.js
+node tests/social/social.test.js
 ```
 
 Static/structure tests only — in-game behavior requires a Bedrock client.
@@ -260,3 +264,12 @@ Employment records, deterministic job matching, and job-search cooldowns. Police
 ## Phase 13 Features (Business Operations)
 
 Shops have employee capacity, vacancies, revenue, maintenance, and private payroll every 7 simulated days. Government and police salaries are never paid here. World data version is 13.
+
+## Phases 14–17
+
+- **14 Production**: Recipe-driven shop production with employees and input consumption.
+- **15 Logistics**: Routes and shipments between shops without pathfinding.
+- **16 Utilities**: Settlement water/power/etc. quality from infrastructure and demand.
+- **17 Social**: Aggregate public opinion and media events from real simulation state.
+
+World data version is **17**.
