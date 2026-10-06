@@ -5,7 +5,7 @@
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
 > **Current status:** Phase 21 — Final Civilization  
-> Version: `1.21.0`  
+> Version: `1.22.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -222,6 +222,9 @@ node tests/nations/nations.test.js
 node tests/phase20/phase20.test.js
 node tests/phase21/final-civilization.test.js
 node tests/phase21/resource-pack.test.js
+node tests/banking/banking.test.js
+node tests/player/player-citizen.test.js
+node tests/player/player-economy.test.js
 ```
 
 Static/structure tests only — in-game behavior requires a Bedrock client.
@@ -289,3 +292,7 @@ World data version is **19**.
 ## Phase 20 — Advanced Civilization
 
 Derived civilization score, world events with cooldowns, simulation tiers, and **original** role appearance textures (32×32 color markers). Asset licenses in `assets/LICENSES.md`. World data version is **20**.
+
+## Player Citizen & Banking
+
+Players receive a CivilCraft profile (wallet + bank account). Commands: `!cc profile`, `!cc bank deposit|withdraw|transfer|statement`, `!cc shop list|buy|sell`. Fully-backed bank deposits. World data version **22**.

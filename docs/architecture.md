@@ -260,3 +260,7 @@ Civilization manager aggregates employment, housing, food, health, education, ut
 ## Phase 21
 
 Appearance: civilcraft:citizen uses synced int property role_index (0–17) selected by employment/leadership. Render controller Array.skins maps index to textures. Legacy tryFeedVillager does not mutate hunger. Candidate seeding and trade automation run on politics/nations intervals.
+
+## Player & Banking
+
+Player profiles mirror citizen wallets using Economy credit/debit. Bank accounts are separate balances with liquidity tracking (fully-backed). Purchases call purchaseGoods. No second currency.

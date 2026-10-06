@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 21 Final Civilization).
+ * CivilCraft — entry point (Player Citizen & Banking).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -73,13 +73,17 @@ import { listParties } from "./politics/parties.js";
 import { initializeNations, getNationsStore } from "./nations/nation-manager.js";
 import { initializeCivilization, getCivilizationStore, formatCivilizationLines } from "./civilization/civilization-manager.js";
 import { initializeAppearance } from "./appearance/appearance-manager.js";
+import { initializeBanking, getBankingStore, openAccount, deposit, withdraw, transfer, getAccount, statementLines } from "./banking/banking-manager.js";
+import { initializePlayerSystem, getOrCreateProfile, formatProfile, playerBuy, playerSell, getPlayersStore } from "./player/player-manager.js";
+import { getBalance } from "./economy/wallet.js";
+import { getAllShops } from "./economy/shops.js";
 import { selectAppearance } from "./civilization/appearance.js";
 import { listNations, getNation } from "./nations/nation-registry.js";
 import { getRelation } from "./nations/diplomacy.js";
 import { getShop, getAllShops } from "./economy/shops.js";
 import { getAllJobs } from "./jobs/job-registry.js";
 
-Logger.info("CivilCraft Phase 21 loading…");
+Logger.info("CivilCraft Player systems loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -107,6 +111,8 @@ initializePolitics();
 initializeNations();
 initializeCivilization();
 initializeAppearance();
+initializeBanking();
+initializePlayerSystem();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -689,6 +695,69 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
 
 
 
+
+        case "help":
+          player.sendMessage("§e!cc profile|bank|shop|jobs|housing|health|politics|election|validate");
+          break;
+        case "profile":
+        case "status": {
+          const pr = getOrCreateProfile(player);
+          for (const line of formatProfile(pr)) player.sendMessage(line);
+          break;
+        }
+        case "bank": {
+          const pr = getOrCreateProfile(player);
+          const bank = getBankingStore();
+          const sub = (args[1] || "balance").toLowerCase();
+          if (sub === "deposit") {
+            const amt = Number(args[2]);
+            const r = deposit(bank, pr.id, pr, amt);
+            player.sendMessage(r.ok ? `§aDeposited ${amt}. Bank ${r.balance}` : `§c${r.error}`);
+          } else if (sub === "withdraw") {
+            const amt = Number(args[2]);
+            const r = withdraw(bank, pr.id, pr, amt);
+            player.sendMessage(r.ok ? `§aWithdrew ${amt}. Wallet ${r.wallet}` : `§c${r.error}`);
+          } else if (sub === "transfer") {
+            const targetName = args[2];
+            const amt = Number(args[3]);
+            const target = [...world.getAllPlayers()].find((p) => p.name === targetName);
+            if (!target) { player.sendMessage("§cTarget player not online"); break; }
+            const tp = getOrCreateProfile(target);
+            const r = transfer(bank, pr.id, tp.id, amt);
+            player.sendMessage(r.ok ? `§aTransferred ${amt}` : `§c${r.error}`);
+          } else if (sub === "statement" || sub === "account") {
+            const acc = getAccount(bank, pr.id) || openAccount(bank, pr.id).account;
+            for (const line of statementLines(acc)) player.sendMessage(line);
+          } else {
+            const acc = getAccount(bank, pr.id);
+            player.sendMessage(acc ? `§6Bank§r ${getBalance(acc)} ₡ wallet ${getBalance(pr)} ₡` : "§cNo account");
+          }
+          break;
+        }
+        case "shop": {
+          const pr = getOrCreateProfile(player);
+          const sub = (args[1] || "list").toLowerCase();
+          if (sub === "list") {
+            for (const s of getAllShops().slice(0, 10)) {
+              player.sendMessage(`${s.id} ${s.type || ""} bal ${s.money ?? s.balance ?? 0}`);
+            }
+          } else if (sub === "buy") {
+            const r = playerBuy(pr, args[2], args[3], Number(args[4] || 1), (args[5] || "wallet").toLowerCase());
+            player.sendMessage(r.ok ? "§aPurchase ok" : `§c${r.error || "failed"}`);
+          } else if (sub === "sell") {
+            const r = playerSell(pr, args[2], args[3], Number(args[4] || 1));
+            player.sendMessage(r.ok ? `§aSold for ${r.total}` : `§c${r.error}`);
+          }
+          break;
+        }
+        case "jobs":
+        case "job":
+          player.sendMessage("§7Use employment system: !cc employment | job status via profile");
+          break;
+        case "housing":
+          player.sendMessage("§7Housing via !cc population / existing housing records");
+          break;
+
         case "validate": {
           const civ = getCivilizationStore();
           const data = getWorldData();
@@ -850,4 +919,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 21 ready.");
+Logger.info("CivilCraft Player systems ready.");

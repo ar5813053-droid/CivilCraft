@@ -103,6 +103,12 @@ const required = [
   "behavior_pack/scripts/civilization/simulation-tiers.js",
   "behavior_pack/scripts/civilization/appearance.js",
   "behavior_pack/scripts/appearance/appearance-manager.js",
+  "behavior_pack/scripts/banking/banking-data.js",
+  "behavior_pack/scripts/banking/banking-manager.js",
+  "behavior_pack/scripts/banking/bank-accounts.js",
+  "behavior_pack/scripts/player/player-data.js",
+  "behavior_pack/scripts/player/player-manager.js",
+
   "behavior_pack/scripts/politics/candidate-seeding.js",
   "behavior_pack/scripts/nations/trade-automation.js",
   "behavior_pack/entities/civilcraft_citizen.json",
