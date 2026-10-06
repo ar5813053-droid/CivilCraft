@@ -116,6 +116,13 @@ const required = [
   "behavior_pack/scripts/memory/memory-manager.js",
   "behavior_pack/scripts/events/event-bus.js",
   "behavior_pack/scripts/memory/memory-subscriber.js",
+  "behavior_pack/scripts/citizenai/personality.js",
+  "behavior_pack/scripts/citizenai/preferences.js",
+  "behavior_pack/scripts/citizenai/goals.js",
+  "behavior_pack/scripts/citizenai/decision-engine.js",
+  "behavior_pack/scripts/citizenai/citizen-ai-data.js",
+  "behavior_pack/scripts/citizenai/citizen-ai-manager.js",
+
   "behavior_pack/scripts/memory/civilization-memory.js",
   "behavior_pack/scripts/memory/citizen-memory.js",
   "behavior_pack/scripts/events/event-types.js",

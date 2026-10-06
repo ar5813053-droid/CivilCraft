@@ -80,6 +80,7 @@ import { initializeMemory, listCivilizationMemories } from "./memory/memory-mana
 import { initializeEvents, getEventsStore, scheduleEvent } from "./events/event-manager.js";
 import { initializeCulture, getCultureStore } from "./culture/festival-manager.js";
 import { initializeAi, getAiStore } from "./ai/behavior-engine.js";
+import { initializeCitizenAi } from "./citizenai/citizen-ai-manager.js";
 import { wireCivilizationReactions } from "./civilization/reaction-engine.js";
 import { getBalance } from "./economy/wallet.js";
 import { getAllShops } from "./economy/shops.js";
@@ -124,6 +125,7 @@ initializeMemory();
 initializeEvents();
 initializeCulture();
 initializeAi();
+initializeCitizenAi();
 wireCivilizationReactions();
 startSimulation();
 

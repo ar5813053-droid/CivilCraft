@@ -5,7 +5,7 @@
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
 > **Current status:** Phase 21 — Final Civilization  
-> Version: `1.24.0`  
+> Version: `1.25.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -315,3 +315,7 @@ Players receive a CivilCraft profile (wallet + bank account). Commands: `!cc pro
 ## Milestone 1 — Memory & Event Bus
 
 Typed event bus (`publish` / `subscribe` / `flushEventBus`) and bounded citizen/civilization memory. Player job start/end and mission completion publish events; memory records important types only.
+
+## Milestone 2 — Citizen Personality & Goals
+
+Deterministic traits, bounded goals (max 3), decision scoring that cannot override critical needs. Daily Life receives `behaviorBoost` from Citizen AI. Schema **25**.

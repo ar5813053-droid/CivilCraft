@@ -17,9 +17,14 @@ export function chooseActivity(input) {
   if (!input.houseId) return "homeless";
   if (input.schoolScheduled) return "studying";
   if (input.workScheduled) return input.jobId === "police_officer" ? "police_service" : "working";
-  if (input.unemployed && input.workingAge) return "job_search";
-  if ((input.social ?? 50) < 30) return "socializing";
+  // Non-critical: personality/goal boosts can tip job_search vs leisure vs socializing
+  const boost = input.behaviorBoost || {};
+  if (input.unemployed && input.workingAge) {
+    if ((boost.job_search || 0) >= (boost.leisure || 0)) return "job_search";
+  }
+  if ((input.social ?? 50) < 30 || (boost.socializing || 0) > 10) return "socializing";
   if (input.hour >= 17 && input.hour < 20) return "leisure";
+  if ((boost.job_search || 0) > 8 && input.unemployed) return "job_search";
   return "idle";
 }
 

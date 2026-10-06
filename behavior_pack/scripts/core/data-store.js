@@ -47,11 +47,12 @@ import { safeJsonParse } from "./utils.js";
  * @property {object|null} memory                // Civilization memory
  * @property {object|null} events                // Event engine
  * @property {object|null} culture               // Culture/calendar
- * @property {object|null} ai                    // Citizen personality/goals
+ * @property {object|null} ai                    // Legacy AI blob
+ * @property {object|null} citizenAi             // Milestone 2 citizen AI
  */
 
 const DEFAULT_WORLD_DATA = () => ({
-  version: 24,
+  version: 25,
   villagers: {},
   households: {},
   villages: {},
@@ -81,7 +82,8 @@ const DEFAULT_WORLD_DATA = () => ({
   memory: null,
   events: null,
   culture: null,
-  ai: null
+  ai: null,
+  citizenAi: null
 });
 
 let cache = null;
@@ -100,7 +102,7 @@ export function loadWorldData() {
       const parsed = safeJsonParse(raw, null);
       if (parsed && typeof parsed === "object" && parsed.version) {
         cache = {
-          version: parsed.version ?? 24,
+          version: parsed.version ?? 25,
           villagers: parsed.villagers ?? {},
           households: parsed.households ?? {},
           villages: parsed.villages ?? {},
@@ -132,7 +134,8 @@ export function loadWorldData() {
           memory: parsed.memory ?? null,
           events: parsed.events ?? null,
           culture: parsed.culture ?? null,
-          ai: parsed.ai ?? null
+          ai: parsed.ai ?? null,
+          citizenAi: parsed.citizenAi ?? null
         };
         Logger.debug("World data loaded from dynamic property.");
         return cache;

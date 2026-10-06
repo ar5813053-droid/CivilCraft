@@ -15,6 +15,7 @@ import { evaluateHouseholdFood } from "./food.js";
 import { evaluateCitizenConsumption } from "./consumption.js";
 import { getEmploymentStore } from "../employment/employment-manager.js";
 import { getEmploymentSnapshot } from "../employment/employment-records.js";
+import { getBehaviorModifierFor } from "../citizenai/citizen-ai-manager.js";
 
 export const DAILY_INTERVAL_TICKS = 600;
 const BATCH = 40;
@@ -71,7 +72,15 @@ function evaluateBatch(data) {
     const household = (data.population?.households || []).find((h) => h.memberIds?.includes(villager.id));
     const employment = getEmploymentSnapshot(getEmploymentStore(), villager.id);
     const jobId = employment.jobId || (villager.profession !== "citizen" ? villager.profession : null);
+    const behaviorBoost = {
+      job_search: getBehaviorModifierFor(villager.id, "job_search"),
+      socializing: getBehaviorModifierFor(villager.id, "socializing"),
+      leisure: getBehaviorModifierFor(villager.id, "leisure"),
+      working: getBehaviorModifierFor(villager.id, "working"),
+      studying: getBehaviorModifierFor(villager.id, "studying")
+    };
     applyDecision(state, {
+      behaviorBoost,
       health: state.needs.health,
       hunger: state.needs.hunger,
       energy: state.needs.energy,
