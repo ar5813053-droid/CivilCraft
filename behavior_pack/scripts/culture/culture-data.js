@@ -10,6 +10,7 @@ export function createDefaultCulture() {
     history: [],
     cooldowns: {},
     impact: {},
+    decorations: { records: [], cursor: 0 },
     stats: {
       festivalsHeld: 0,
       totalAttendance: 0,
@@ -30,6 +31,7 @@ export function normalizeCulture(raw) {
     history: Array.isArray(raw.history) ? raw.history.slice(-MAX_CULTURE_HISTORY) : [],
     cooldowns: raw.cooldowns && typeof raw.cooldowns === "object" ? raw.cooldowns : {},
     impact: raw.impact && typeof raw.impact === "object" ? raw.impact : {},
+    decorations: raw.decorations && typeof raw.decorations === "object" ? raw.decorations : { records: [], cursor: 0 },
     stats: { ...base.stats, ...(raw.stats || {}) }
   };
 }

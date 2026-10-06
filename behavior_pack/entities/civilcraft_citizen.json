@@ -9,7 +9,10 @@
       "properties": {
         "civilcraft:role_index": {
           "type": "int",
-          "range": [0, 20],
+          "range": [
+            0,
+            31
+          ],
           "default": 0,
           "client_sync": true
         }
@@ -17,10 +20,24 @@
     },
     "component_groups": {},
     "components": {
-      "minecraft:type_family": { "family": ["civilcraft", "mob", "villager"] },
-      "minecraft:collision_box": { "width": 0.6, "height": 1.9 },
-      "minecraft:health": { "value": 20, "max": 20 },
-      "minecraft:movement": { "value": 0.25 },
+      "minecraft:type_family": {
+        "family": [
+          "civilcraft",
+          "mob",
+          "villager"
+        ]
+      },
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.9
+      },
+      "minecraft:health": {
+        "value": 20,
+        "max": 20
+      },
+      "minecraft:movement": {
+        "value": 0.25
+      },
       "minecraft:navigation.walk": {
         "can_pass_doors": true,
         "can_walk": true,
@@ -29,9 +46,14 @@
       "minecraft:movement.basic": {},
       "minecraft:jump.static": {},
       "minecraft:physics": {},
-      "minecraft:pushable": { "is_pushable": true, "is_pushable_by_piston": true },
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
       "minecraft:nameable": {},
-      "minecraft:scale": { "value": 0.95 }
+      "minecraft:scale": {
+        "value": 0.95
+      }
     },
     "events": {}
   }

@@ -18,6 +18,9 @@ import { publish } from "../events/event-bus.js";
 import { rememberCivilization } from "../memory/memory-manager.js";
 import { addCitizenMemory } from "../memory/citizen-memory.js";
 import { reportEvent } from "../social/media.js";
+import { createDecorationStore, planDecorations, placeDecorationBatch, cleanupFestivalDecorations } from "./festival-decorations.js";
+import { generateFestivalMissions } from "./festival-missions.js";
+import { publish as busPublish } from "../events/event-bus.js";
 
 let initialized = false;
 export const CULTURE_INTERVAL = 1200;
@@ -33,6 +36,7 @@ export function initializeCulture() {
   initialized = true;
   const data = getWorldData();
   data.culture = data.culture ? normalizeCulture(data.culture) : createDefaultCulture();
+  if (!data.culture.decorations) data.culture.decorations = createDecorationStore();
   // Register festival defs into world event definitions dynamically for scheduling
   ensureFestivalEventDefs();
   system.runInterval(() => {
@@ -119,6 +123,7 @@ function tickCulture(data) {
         metadata: { festivalId: fest.id, trackId: track.id }
       });
       applyFestivalDemand(fest, track.completedKeys, "prep");
+      try { generateFestivalMissions(data, fest, track, "prep"); } catch { /* */ }
       if (data.social) {
         reportEvent(data.social, {
           type: "local_news",
@@ -134,6 +139,14 @@ function tickCulture(data) {
       track.participantIds = selectFestivalParticipants(data, fest);
       applyFestivalDemand(fest, track.completedKeys, "active");
       applyHappiness(data, track, fest);
+      try {
+        generateFestivalMissions(data, fest, track, "active");
+        const center = data.settlements?.settlements?.settlement_main?.center || { x: 0, y: 64, z: 0 };
+        const planned = planDecorations(data.culture.decorations || createDecorationStore(), fest.id, center);
+        if (!data.culture.decorations) data.culture.decorations = createDecorationStore();
+        placeDecorationBatch(data.culture.decorations, planned);
+        busPublish("FESTIVAL_VISUALS_STARTED", { source: "culture", metadata: { festivalId: fest.id } });
+      } catch (e) { Logger.warn(`Festival visuals: ${e}`); }
       publish("FESTIVAL_STARTED", {
         source: "culture",
         metadata: { festivalId: fest.id, participants: track.participantIds.length }
@@ -256,6 +269,13 @@ function mirrorWorldEvent(data, fest, track, day) {
 function completeFestival(store, data, track, fest, day) {
   track.status = "completed";
   applyFestivalDemand(fest, track.completedKeys, "complete");
+  try {
+    if (data.culture.decorations) {
+      cleanupFestivalDecorations(data.culture.decorations, fest.id);
+      busPublish("FESTIVAL_VISUALS_CLEARED", { source: "culture", metadata: { festivalId: fest.id } });
+    }
+    generateFestivalMissions(data, fest, track, "cleanup");
+  } catch (e) { Logger.warn(`Festival cleanup: ${e}`); }
   track.impact.attendance = track.participantIds.length;
   track.impact.economicGoods = Object.keys(track.completedKeys).filter((k) => k.includes("demand"));
 

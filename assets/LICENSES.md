@@ -26,3 +26,7 @@ Role textures are **placeholder color-coded skins** for deterministic role mappi
 | `resource_pack/render_controllers/civilcraft_citizen.render_controllers.json` | Original | CivilCraft Team | MIT |
 
 Role PNGs remain original solid-color markers (32×32). Geometry uses Bedrock built-in `geometry.villager.v2.masked` reference (not redistributed).
+
+## Festival textures (Milestone 4.5)
+
+Festival role textures (`festival_*.png`) are derived from original CivilCraft role textures (procedural/recolored placeholders). License: same as project (MIT / original CivilCraft assets). Not Marketplace content.

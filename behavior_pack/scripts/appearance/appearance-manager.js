@@ -7,6 +7,8 @@ import { world, system } from "@minecraft/server";
 import { Logger } from "../core/logger.js";
 import { getWorldData } from "../core/data-store.js";
 import { selectAppearance, ROLE_APPEARANCE, hashId } from "../civilization/appearance.js";
+import { selectFestivalAppearance } from "./festival-appearance.js";
+import { listActiveFestivals } from "../culture/culture-manager.js";
 import { getEmploymentStore } from "../employment/employment-manager.js";
 import { getEmploymentSnapshot } from "../employment/employment-records.js";
 import { getGovernment } from "../government/leadership.js";
@@ -29,7 +31,20 @@ export const ROLE_INDEX = Object.freeze({
   civilcraft_civilian_a: 14,
   civilcraft_civilian_b: 15,
   civilcraft_civilian_c: 16,
-  civilcraft_civilian_d: 17
+  civilcraft_civilian_d: 17,
+  festival_christmas_civilian: 18,
+  festival_christmas_farmer: 19,
+  festival_christmas_worker: 20,
+  festival_christmas_police: 21,
+  festival_diwali_civilian: 22,
+  festival_diwali_trader: 23,
+  festival_diwali_farmer: 24,
+  festival_holi_civilian: 25,
+  festival_holi_worker: 26,
+  festival_ramadan_civilian: 27,
+  festival_ramadan_teacher: 28,
+  festival_eid_civilian: 29,
+  festival_eid_festive: 30
 });
 
 export function appearanceKeyToIndex(key) {
@@ -40,11 +55,22 @@ export function appearanceKeyToIndex(key) {
 export function resolveAppearanceForRecord(villager) {
   if (!villager) return "civilcraft_civilian";
   const emp = getEmploymentSnapshot(getEmploymentStore(), villager.id);
+  const jobId = emp.jobId || villager.profession;
   const gov = getGovernment();
   const isMayor = gov?.leadership?.mayor?.villagerId === villager.id;
   const isLeader = false;
+  // Festival appearance if participating in active festival
+  try {
+    const active = listActiveFestivals();
+    for (const track of active) {
+      if (track.status !== "active" && track.status !== "preparation") continue;
+      if (!(track.participantIds || []).includes(villager.id)) continue;
+      const festKey = selectFestivalAppearance(track.festivalId, jobId, villager.id);
+      if (festKey) return festKey;
+    }
+  } catch { /* culture optional */ }
   return selectAppearance(villager, {
-    jobId: emp.jobId || villager.profession,
+    jobId,
     isMayor,
     isLeader
   });

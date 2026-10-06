@@ -5,7 +5,7 @@
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
 > **Current status:** Phase 21 — Final Civilization  
-> Version: `1.27.0`  
+> Version: `1.28.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -327,3 +327,7 @@ Full calendar (120-day year), event registry, lifecycle scheduled→preparation�
 ## Milestone 4 — Festivals & Culture (COMPLETE)
 
 Christmas, Diwali, Holi, Ramadan, Eid + harvest. Culture schedules via world calendar, real `recordDemand`, happiness, media, memory, Event Bus. Player: `!cc festivals`, `!cc festival join`. Schema **27**.
+
+## Milestone 4.5 — Festival Visuals
+
+Festival appearance (role_index 18–30), profession-preserving outfits, safe decoration place/cleanup, real festival missions. Schema **28**. Texture placeholders derived from original CivilCraft role art.

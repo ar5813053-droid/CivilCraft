@@ -22,13 +22,32 @@
             "Texture.civilian_a",
             "Texture.civilian_b",
             "Texture.civilian_c",
-            "Texture.civilian_d"
+            "Texture.civilian_d",
+            "Texture.festival_christmas_civilian",
+            "Texture.festival_christmas_farmer",
+            "Texture.festival_christmas_worker",
+            "Texture.festival_christmas_police",
+            "Texture.festival_diwali_civilian",
+            "Texture.festival_diwali_trader",
+            "Texture.festival_diwali_farmer",
+            "Texture.festival_holi_civilian",
+            "Texture.festival_holi_worker",
+            "Texture.festival_ramadan_civilian",
+            "Texture.festival_ramadan_teacher",
+            "Texture.festival_eid_civilian",
+            "Texture.festival_eid_festive"
           ]
         }
       },
       "geometry": "Geometry.default",
-      "materials": [ { "*": "Material.default" } ],
-      "textures": [ "Array.skins[query.property('civilcraft:role_index')]" ]
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.skins[query.property('civilcraft:role_index')]"
+      ]
     }
   }
 }
