@@ -337,3 +337,11 @@ Festival appearance (role_index 18–30), profession-preserving outfits, safe de
 CivilCraft does **not** ship third-party festival packs that forbid redistribution.
 Use `!cc festival addons list` to see integration status. Missing external packs → CivilCraft fallback visuals.
 See `docs/festival-addons.md` and `assets/LICENSES.md`.
+
+## Final playable integration
+
+CivilCraft is an integrated Bedrock civilization simulation: citizens, economy, government, politics/elections, justice, services, festivals (fixed yearly calendar), player citizen/jobs/banking, nations, and memory/event bus.
+
+Primary commands: `!cc status`, `!cc calendar`, `!cc validate`, `!cc jobs`, `!cc bank`, `!cc election`, `!cc festivals`.
+
+Target: Minecraft Bedrock with `@minecraft/server` stable APIs. Runtime validation must be performed in-game.

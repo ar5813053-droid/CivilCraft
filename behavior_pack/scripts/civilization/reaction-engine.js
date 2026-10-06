@@ -6,6 +6,7 @@ import { subscribe } from "../events/event-bus.js";
 import { rememberCivilization } from "../memory/memory-manager.js";
 import { recordDemand } from "../economy/prices.js";
 import { Logger } from "../core/logger.js";
+import { wireCrisisResponses } from "./crisis-response.js";
 
 let wired = false;
 
@@ -40,5 +41,13 @@ export function wireCivilizationReactions() {
     rememberCivilization("election", payload || {});
   });
 
+  subscribe("FESTIVAL_COMPLETED", (payload) => {
+    rememberCivilization("festival_completed", payload || {});
+  });
+
+  // Food crisis → bounded government relief attempt via public spending path if available
+  
+
+  wireCrisisResponses();
   Logger.info("Civilization reaction engine wired.");
 }

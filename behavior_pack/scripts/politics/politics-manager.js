@@ -43,7 +43,11 @@ function pushEvent(store, type, message) {
 export function processPolitics(data) {
   const store = data.politics;
   if (!store) return;
-  const day = Math.floor(Date.now() / 86400000);
+  // Prefer CivilCraft calendar; fall back to wall-clock day
+  const cal = data.worldEvents?.calendar;
+  const day = cal?.totalDays ?? Math.floor(Date.now() / 86400000);
+  const doy = cal?.dayOfYear ?? (day % 120);
+  const civYear = cal?.year ?? 1;
   const gov = getGovernment();
   if (!gov) return;
 
@@ -54,7 +58,9 @@ export function processPolitics(data) {
   let election = [...store.elections].reverse().find((e) => e.status !== "completed");
   if (!election) {
     const termStart = gov.termStartDay ?? day;
-    if (day - termStart >= ELECTION_TERM_DAYS - CAMPAIGN_DAYS) {
+    // Fixed annual election window: day-of-year 28–35 (campaign) / voting follows
+    const annualWindow = doy >= 28 && doy <= 40;
+    if (annualWindow || day - termStart >= ELECTION_TERM_DAYS - CAMPAIGN_DAYS) {
       election = createElection(store, { governmentId: gov.id || data.government?.primaryId, startDay: day });
       startCampaign(election, day);
       for (const c of store.candidates.filter((x) => x.office === "mayor").slice(0, 4)) {

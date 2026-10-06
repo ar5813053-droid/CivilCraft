@@ -12,6 +12,7 @@ import { ensureDemographics } from "./demographics.js";
 import { pushPopulationEvent } from "./population-events.js";
 import { populationStats } from "./population-stats.js";
 import { capacityFromHousing } from "../housing/housing-capacity.js";
+import { processAging, processMarriages, processBirths } from "./lifecycle.js";
 
 export const POPULATION_INTERVAL_TICKS = 3600;
 const BATCH = 40;
@@ -26,6 +27,11 @@ export function initializePopulation() {
   system.runInterval(() => {
     try {
       tickDemographics(data);
+      const day = data.worldEvents?.calendar?.totalDays ?? Math.floor(Date.now() / 86400000);
+      const store = data.population;
+      store.ageCursor = processAging(store, data.villagers, store.ageCursor || 0, day).cursor;
+      processMarriages(store, data.villagers, day);
+      processBirths(store, data.villagers, day);
       syncSettlementPopulation(data);
       markDirty();
     } catch (e) {

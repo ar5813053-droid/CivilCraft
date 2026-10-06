@@ -85,6 +85,8 @@ import { initializeCitizenAi } from "./citizenai/citizen-ai-manager.js";
 import { initializeWorldEvents, getWorldEventsStore, listActiveEvents, listUpcoming, getEventInfo, playerJoinEvent, playerLeaveEvent, calendarLines, scheduleManual, cancelEvent } from "./worldevents/world-event-manager.js";
 import { listDefinitions } from "./worldevents/event-registry.js";
 import { wireCivilizationReactions } from "./civilization/reaction-engine.js";
+import { playerCastVote, playerJoinParty, playerLeaveParty, listElectionInfo } from "./politics/player-politics.js";
+import { runValidation } from "./core/validate.js";
 import { getBalance } from "./economy/wallet.js";
 import { getAllShops } from "./economy/shops.js";
 import { selectAppearance } from "./civilization/appearance.js";
@@ -835,6 +837,14 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           break;
 
         case "validate": {
+          const report = runValidation();
+          player.sendMessage(`§6Validation: ${report.status}`);
+          for (const c of report.checks.slice(0, 25)) {
+            const col = c.result === "PASS" ? "§a" : c.result === "WARN" ? "§e" : "§c";
+            player.sendMessage(`${col}${c.result}§r ${c.name}${c.detail ? " — " + c.detail : ""}`);
+          }
+          // fallthrough keep old stats if present
+
           const civ = getCivilizationStore();
           const data = getWorldData();
           player.sendMessage(`§6Validate§r v${data.version || "?"} score ${civ.score}`);
@@ -924,11 +934,31 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
 
         case "politics":
         case "parties":
-          player.sendMessage((getPoliticsStore().parties || []).map((p) => p.id).join(", "));
+          player.sendMessage((getPoliticsStore().parties || []).map((p) => p.id).join(", ") || "§7No parties");
           break;
-        case "election":
-          player.sendMessage(`§7Elections ${getPoliticsStore().elections.length}`);
+        case "election": {
+          const esub = (args[1] || "info").toLowerCase();
+          const epr = getOrCreateProfile(player);
+          if (esub === "vote") {
+            const r = playerCastVote(epr.id, args[2] || null);
+            player.sendMessage(r.ok ? "§aVote recorded" : `§c${r.error || "failed"}`);
+          } else if (esub === "join") {
+            const r = playerJoinParty(epr.id, args[2]);
+            player.sendMessage(r.ok ? `§aJoined ${r.partyId}` : `§c${r.error}`);
+          } else if (esub === "leave") {
+            const r = playerLeaveParty(epr.id);
+            player.sendMessage(r.ok ? "§aLeft party" : `§c${r.error}`);
+          } else {
+            const info = listElectionInfo();
+            const el = info.election;
+            player.sendMessage(el ? `Election ${el.id} §e${el.status}` : "§7No election");
+            player.sendMessage(`§7Elections total ${getPoliticsStore().elections.length}`);
+            for (const c of (info.candidates || []).slice(0, 6)) {
+              player.sendMessage(`  ${c.id} ${c.office || ""}`);
+            }
+          }
           break;
+        }
         case "candidates":
           player.sendMessage(`§7Candidates ${getPoliticsStore().candidates.length}`);
           break;
