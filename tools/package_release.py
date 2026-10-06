@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "dist"
 BP_UUID = "2a27c2cc-b7d6-4ac4-9637-95c770a6d3be"
 RP_UUID = "9296565a-743a-4368-9426-d469027a5956"
-VERSION = [1, 30, 0]
+VERSION = [1, 31, 0]
 
 
 def zip_dir(src, z, prefix=""):

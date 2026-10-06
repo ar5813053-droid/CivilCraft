@@ -1,40 +1,19 @@
-# CivilCraft Android Install (Critical)
+# CivilCraft on Minecraft Bedrock 26.52 (Android)
 
-## Why the previous world looked vanilla
+## Root cause of previous failures
 
-1. **Script never activated** — chat commands were gated and/or the script module failed to load.
-2. **Incomplete `level.dat`** — a real Bedrock LevelDB cannot be generated without Minecraft; packs must load via Script API after import.
-3. **`@minecraft/server` version** updated to `1.14.0` for broader 1.21+ compatibility.
+`main.js` imported ~80 local modules at top level. **Any** import failure prevented the entire script (including `!cc ping`) from running. Fixed: bootstrap has **zero** local imports; systems load via dynamic `import()`.
 
-## Recommended install path (most reliable)
+## Install
 
-### Option A — .mcaddon (preferred)
+1. Install **fresh** `CivilCraft.mcaddon` (version **1.31.0**).
+2. Create a **NEW** world.
+3. Enable **CivilCraft** Resource Pack and Behavior Pack.
+4. Enter the world.
+5. Within a few seconds you should see: `CivilCraft script loaded. Use !cc ping`
+6. Type **exactly**: `!cc ping` and send.
+7. Expected: `CivilCraft runtime OK`
+8. Then: `!cc runtime`
+9. Then: `!cc build capital` (after App: LOADED)
 
-1. Download **CivilCraft.mcaddon**
-2. Open it on your Android device (Minecraft should import BP + RP)
-3. Create a **New World**
-4. **Resource Packs** → activate **CivilCraft Resources**
-5. **Behavior Packs** → activate **CivilCraft**
-6. Turn **ON** any **Beta APIs / Experiments** required for scripting on your build (if shown)
-7. Create & enter world
-8. You must see: `CivilCraft loaded successfully. Type !cc ping`
-9. Type: `!cc ping` → expect `CivilCraft runtime OK`
-10. Type: `!cc build capital` → capital buildings appear around you
-
-### Option B — .mcworld
-
-1. Import **CivilCraft-Complete.mcworld**
-2. If packs are not active, open world settings and enable CivilCraft BP+RP
-3. Same checks as steps 8–10 above
-
-## Runtime checklist
-
-| Check | Expected |
-|-------|----------|
-| Chat on join | §aCivilCraft loaded successfully |
-| `!cc ping` | CivilCraft runtime OK |
-| `!cc build capital` | Building capital… + blocks appear |
-| `!cc validate` | PASS/WARN lines |
-| `!cc calendar` | Year / day / festivals |
-
-If `!cc ping` does nothing, the Behavior Pack script is **not running** — re-enable the BP and Script/Beta experiments.
+If step 6 fails, open content/script log and look for `[CivilCraft]`.
