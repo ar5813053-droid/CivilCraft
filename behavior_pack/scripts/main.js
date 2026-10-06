@@ -81,6 +81,8 @@ import { initializeEvents, getEventsStore, scheduleEvent } from "./events/event-
 import { initializeCulture, getCultureStore } from "./culture/festival-manager.js";
 import { initializeAi, getAiStore } from "./ai/behavior-engine.js";
 import { initializeCitizenAi } from "./citizenai/citizen-ai-manager.js";
+import { initializeWorldEvents, getWorldEventsStore, listActiveEvents, listUpcoming, getEventInfo, playerJoinEvent, playerLeaveEvent, calendarLines, scheduleManual, cancelEvent } from "./worldevents/world-event-manager.js";
+import { listDefinitions } from "./worldevents/event-registry.js";
 import { wireCivilizationReactions } from "./civilization/reaction-engine.js";
 import { getBalance } from "./economy/wallet.js";
 import { getAllShops } from "./economy/shops.js";
@@ -126,6 +128,7 @@ initializeEvents();
 initializeCulture();
 initializeAi();
 initializeCitizenAi();
+initializeWorldEvents();
 wireCivilizationReactions();
 startSimulation();
 
@@ -840,16 +843,54 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
         }
 
         case "culture":
-        case "calendar":
         case "festivals": {
           const c = getCultureStore();
-          player.sendMessage(`§6Year ${c.year} day ${c.calendarDay}`);
+          player.sendMessage(`§6Culture year ${c.year} day ${c.calendarDay}`);
           for (const f of (c.activeFestivals || []).slice(0, 5)) player.sendMessage(`Festival ${f.nameKey}`);
           break;
         }
+        case "calendar": {
+          for (const line of calendarLines()) player.sendMessage(line);
+          break;
+        }
         case "events": {
-          const es = getEventsStore();
-          player.sendMessage(`Active-ish events ${es.events.length} history ${es.history.length}`);
+          const sub = (args[1] || "active").toLowerCase();
+          if (sub === "upcoming") {
+            for (const e of listUpcoming().slice(0, 8)) player.sendMessage(`${e.id} ${e.type} ${e.status}`);
+          } else if (sub === "history") {
+            const h = getWorldEventsStore().history.slice(-8);
+            for (const e of h) player.sendMessage(`${e.id} ${e.type} ${e.outcome}`);
+          } else if (sub === "types") {
+            for (const d of listDefinitions().slice(0, 12)) player.sendMessage(`${d.id} [${d.category}]`);
+          } else {
+            for (const e of listActiveEvents().slice(0, 10)) {
+              player.sendMessage(`${e.id} ${e.name || e.type} ${e.status} p${e.participantIds?.length || 0}`);
+            }
+          }
+          break;
+        }
+        case "event": {
+          const sub = (args[1] || "info").toLowerCase();
+          const pr = getOrCreateProfile(player);
+          if (sub === "info") {
+            const info = getEventInfo(args[2]);
+            player.sendMessage(info ? `${info.id} ${info.type || info.name} ${info.status || info.outcome}` : "§cNot found");
+          } else if (sub === "join") {
+            const r = playerJoinEvent(pr.id, args[2]);
+            player.sendMessage(r.ok ? "§aJoined event" : `§c${r.error || "failed"}`);
+          } else if (sub === "leave") {
+            const r = playerLeaveEvent(pr.id, args[2]);
+            player.sendMessage(r.ok ? "§aLeft event" : `§c${r.error || "failed"}`);
+          } else if (sub === "create") {
+            const store = getWorldEventsStore();
+            const r = scheduleManual(store, args[2], { startDay: store.calendar.totalDays });
+            player.sendMessage(r.ok ? `§aScheduled ${r.instance.id}` : `§c${r.error}`);
+          } else if (sub === "cancel") {
+            const r = cancelEvent(getWorldEventsStore(), args[2]);
+            player.sendMessage(r.ok ? "§aCancelled" : `§c${r.error}`);
+          } else {
+            player.sendMessage("§e!cc event info|join|leave|create|cancel <id>");
+          }
           break;
         }
         case "memory": {

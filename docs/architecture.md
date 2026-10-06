@@ -272,3 +272,7 @@ hireCitizen accepts player profile ids. Missions generated from shops/justice/he
 ## Living Civilization
 
 Event bus publishes FOOD_SHORTAGE, FESTIVAL_*, EVENT_*. Memory records major events. Culture advances a 120-day year with festival definitions. AI assigns goals in batches of 30. Score 2.0 explains component contributions.
+
+## Milestone 3 — World Events
+
+`worldevents/` owns definitions, calendar, instances, participants, effect application. Effects call Economy `recordDemand`, Daily Life happiness, Social opinion/media, Memory, Event Bus. Idempotent via `completedEffects` keys.

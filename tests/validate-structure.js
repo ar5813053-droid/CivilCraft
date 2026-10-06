@@ -122,6 +122,15 @@ const required = [
   "behavior_pack/scripts/citizenai/decision-engine.js",
   "behavior_pack/scripts/citizenai/citizen-ai-data.js",
   "behavior_pack/scripts/citizenai/citizen-ai-manager.js",
+  "behavior_pack/scripts/worldevents/event-registry.js",
+  "behavior_pack/scripts/worldevents/event-calendar.js",
+  "behavior_pack/scripts/worldevents/event-instances.js",
+  "behavior_pack/scripts/worldevents/event-participants.js",
+  "behavior_pack/scripts/worldevents/event-effects.js",
+  "behavior_pack/scripts/worldevents/event-scheduler.js",
+  "behavior_pack/scripts/worldevents/world-event-data.js",
+  "behavior_pack/scripts/worldevents/world-event-manager.js",
+
 
   "behavior_pack/scripts/memory/civilization-memory.js",
   "behavior_pack/scripts/memory/citizen-memory.js",

@@ -5,7 +5,7 @@
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
 > **Current status:** Phase 21 — Final Civilization  
-> Version: `1.25.0`  
+> Version: `1.26.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -319,3 +319,7 @@ Typed event bus (`publish` / `subscribe` / `flushEventBus`) and bounded citizen/
 ## Milestone 2 — Citizen Personality & Goals
 
 Deterministic traits, bounded goals (max 3), decision scoring that cannot override critical needs. Daily Life receives `behaviorBoost` from Citizen AI. Schema **25**.
+
+## Milestone 3 — World Event Engine (COMPLETE)
+
+Full calendar (120-day year), event registry, lifecycle scheduled→preparation→active→closing→completed, participants, idempotent effects (demand, happiness, opinion, media, memory, event bus). Commands: `!cc calendar`, `!cc events`, `!cc event join|leave|info`. Schema **26**.

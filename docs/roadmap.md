@@ -216,3 +216,5 @@ Each phase should ship with:
 ## Phase 20 — Advanced Dynamic Civilization & Realistic World ✅
 
 ## Phase 21 — Final Civilization Completion ✅
+
+## Milestone 3 — Generic Event Engine + Calendar — COMPLETE ✅
