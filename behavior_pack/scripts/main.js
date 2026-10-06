@@ -78,7 +78,7 @@ import { initializePlayerSystem, getOrCreateProfile, formatProfile, playerBuy, p
 import { initializePlayerJobs, listAvailableJobs, listNearbyEmployers, applyForJob, quitJob, jobStatus, playerMissions, doAcceptMission, doCompleteMission, doAbandonMission, getPlayerJobsStore } from "./playerjobs/player-job-manager.js";
 import { initializeMemory, listCivilizationMemories } from "./memory/memory-manager.js";
 import { initializeEvents, getEventsStore, scheduleEvent } from "./events/event-manager.js";
-import { initializeCulture, getCultureStore, listActiveFestivals, listUpcomingFestivals, playerJoinFestival, playerLeaveFestival, cancelFestival, cultureStats, listFestivals, getFestival } from "./culture/culture-manager.js";
+import { initializeCulture, getCultureStore, listActiveFestivals, listUpcomingFestivals, playerJoinFestival, playerLeaveFestival, cancelFestival, cultureStats, listFestivals, getFestival, festivalCalendarLines } from "./culture/culture-manager.js";
 import { listAllAddonStatuses, getAddonStatus, setAddonEnabled } from "./culture/integrations/festival-addon-adapter.js";
 import { initializeAi, getAiStore } from "./ai/behavior-engine.js";
 import { initializeCitizenAi } from "./citizenai/citizen-ai-manager.js";
@@ -845,13 +845,20 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
 
         case "culture":
         case "festivals": {
-          const c = getCultureStore();
-          player.sendMessage(`§6Culture year ${c.year} day ${c.calendarDay}`);
-          for (const f of (c.activeFestivals || []).slice(0, 5)) player.sendMessage(`Festival ${f.nameKey}`);
+          const cal = getWorldEventsStore().calendar;
+          const active = listActiveFestivals();
+          if (active.length) {
+            player.sendMessage("§6Active:");
+            for (const f of active) player.sendMessage(`  ${f.name || f.festivalId} (${f.status})`);
+          } else player.sendMessage("§6Active: none");
+          player.sendMessage("§6Upcoming:");
+          for (const u of listUpcomingFestivals(cal)) {
+            player.sendMessage(`  ${u.name} — Day ${u.startDayOfYear}${u.year > (cal?.year || 1) ? " next year" : ""}`);
+          }
           break;
         }
         case "calendar": {
-          for (const line of calendarLines()) player.sendMessage(line);
+          for (const line of festivalCalendarLines(getWorldEventsStore().calendar)) player.sendMessage(line);
           break;
         }
         case "events": {

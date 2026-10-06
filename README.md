@@ -5,7 +5,7 @@
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
 > **Current status:** Phase 21 — Final Civilization  
-> Version: `1.28.0`  
+> Version: `1.28.1`  
 > Target: Minecraft Bedrock 1.21+
 
 ---

@@ -6,14 +6,13 @@
 import { system } from "@minecraft/server";
 import { Logger } from "../core/logger.js";
 import { getWorldData, markDirty } from "../core/data-store.js";
-import { createDefaultCulture, normalizeCulture, MAX_CULTURE_HISTORY } from "./culture-data.js";
-import { listFestivals, getFestival, festivalsForDayOfYear } from "./festival-registry.js";
+import { createDefaultCulture, normalizeCulture, MAX_CULTURE_HISTORY, MAX_COMPLETED_OCCURRENCES } from "./culture-data.js";
+import { listFestivals, getFestival } from "./festival-registry.js";
 import { generateCulturalPreferences, participationScore } from "./cultural-preferences.js";
 import { applyFestivalDemand } from "./festival-economy.js";
 import { tickActivities } from "./festival-activities.js";
 import { getPersonality } from "../citizenai/citizen-ai-manager.js";
 import { createInstance, Lifecycle } from "../worldevents/event-instances.js";
-import { selectParticipants } from "../worldevents/event-participants.js";
 import { publish } from "../events/event-bus.js";
 import { rememberCivilization } from "../memory/memory-manager.js";
 import { addCitizenMemory } from "../memory/citizen-memory.js";
@@ -22,6 +21,16 @@ import { createDecorationStore, planDecorations, placeDecorationBatch, cleanupFe
 import { generateFestivalMissions } from "./festival-missions.js";
 import { publish as busPublish } from "../events/event-bus.js";
 import { onFestivalPhase } from "./integrations/festival-addon-lifecycle.js";
+import {
+  FIXED_ANNUAL_SCHEDULE,
+  getScheduleEntry,
+  occurrenceKey,
+  prepStartTotalDay,
+  activeStartTotalDay,
+  phaseForTotalDay,
+  listUpcomingFromCalendar
+} from "./festival-calendar.js";
+import { MAX_COMPLETED_OCCURRENCES } from "./culture-data.js";
 
 let initialized = false;
 export const CULTURE_INTERVAL = 1200;
@@ -97,106 +106,95 @@ function tickCulture(data) {
     markDirty();
     return;
   }
-  const day = we.calendar.totalDays;
-  const doy = we.calendar.dayOfYear;
+  if (!store.completedOccurrences) store.completedOccurrences = {};
 
-  // Schedule festivals for this day-of-year
-  for (const fest of festivalsForDayOfYear(doy)) {
-    if (store.cooldowns[fest.id] != null && day - store.cooldowns[fest.id] < (fest.cooldownDays || 90)) {
-      continue;
+  const day = we.calendar.totalDays;
+  const year = we.calendar.year || 1;
+
+  // Fixed annual schedule: start/restore tracks by civilization year + dayOfYear
+  for (const entry of FIXED_ANNUAL_SCHEDULE) {
+    const fest = getFestival(entry.festivalId);
+    if (!fest) continue;
+    const key = occurrenceKey(entry.festivalId, year);
+    if (store.completedOccurrences[key]) continue;
+
+    const phase = phaseForTotalDay(day, year, entry);
+    if (!phase) continue;
+
+    let track = store.activeFestivals.find(
+      (a) => a.festivalId === entry.festivalId && a.civilizationYear === year
+    );
+    if (!track) {
+      track = startFestivalTrack(store, data, fest, entry, year, day, phase);
+    } else {
+      // Reload mid-window: snap phase forward if needed (never backward from completed)
+      if (track.status !== phase && track.status !== "completed" && track.status !== "cancelled") {
+        syncTrackPhase(store, data, track, fest, entry, phase, day);
+      }
     }
-    if (store.activeFestivals.some((a) => a.festivalId === fest.id && a.status !== "completed")) {
-      continue;
-    }
-    startFestivalTrack(store, data, fest, day);
   }
 
-  // Advance active tracks
+  // Advance active tracks by absolute calendar
   for (const track of store.activeFestivals) {
     const fest = getFestival(track.festivalId);
-    if (!fest) continue;
-    const phaseDay = day - track.startDay;
+    const entry = getScheduleEntry(track.festivalId);
+    if (!fest || !entry) continue;
+    const y = track.civilizationYear || year;
+    const phase = phaseForTotalDay(day, y, entry);
 
-    if (track.status === "scheduled" && phaseDay >= 0) {
-      track.status = "preparation";
-      try { onFestivalPhase(fest.id, "preparation", { trackId: track.id }); } catch { /* */ }
-      publish("FESTIVAL_PREPARATION_STARTED", {
-        source: "culture",
-        metadata: { festivalId: fest.id, trackId: track.id }
-      });
-      applyFestivalDemand(fest, track.completedKeys, "prep");
-      try { generateFestivalMissions(data, fest, track, "prep"); } catch { /* */ }
-      if (data.social) {
-        reportEvent(data.social, {
-          type: "local_news",
-          headlineKey: `${fest.mediaKey || fest.id}_upcoming`,
-          severity: 2,
-          createdDay: Math.floor(Date.now() / 86400000)
-        });
-      }
-    }
-
-    if (track.status === "preparation" && phaseDay >= (fest.preparationDays || 0)) {
-      track.status = "active";
-      track.participantIds = selectFestivalParticipants(data, fest);
-      applyFestivalDemand(fest, track.completedKeys, "active");
-      applyHappiness(data, track, fest);
-      try {
-        generateFestivalMissions(data, fest, track, "active");
-        const center = data.settlements?.settlements?.settlement_main?.center || { x: 0, y: 64, z: 0 };
-        const planned = planDecorations(data.culture.decorations || createDecorationStore(), fest.id, center);
-        if (!data.culture.decorations) data.culture.decorations = createDecorationStore();
-        placeDecorationBatch(data.culture.decorations, planned);
-        busPublish("FESTIVAL_VISUALS_STARTED", { source: "culture", metadata: { festivalId: fest.id } });
-        try { onFestivalPhase(fest.id, "active", { trackId: track.id }); } catch { /* */ }
-      } catch (e) { Logger.warn(`Festival visuals: ${e}`); }
-      publish("FESTIVAL_STARTED", {
-        source: "culture",
-        metadata: { festivalId: fest.id, participants: track.participantIds.length }
-      });
-      if (data.social) {
-        reportEvent(data.social, {
-          type: "local_news",
-          headlineKey: fest.mediaKey || fest.id,
-          severity: 3,
-          createdDay: Math.floor(Date.now() / 86400000)
-        });
-      }
-      // Mirror into world-events instance for shared commands
-      mirrorWorldEvent(data, fest, track, day);
-    }
-
-    if (track.status === "active") {
-      tickActivities(track, fest);
-      // Ramadan: evening food demand boost (preference-based participants only)
-      if (fest.fastingAware && phaseDay % 2 === 0) {
-        applyFestivalDemand(fest, track.completedKeys, `eve_${phaseDay}`);
-      }
-      const totalLen = (fest.preparationDays || 0) + (fest.durationDays || 1);
-      if (phaseDay >= totalLen - (fest.closingDays || 1)) {
-        track.status = "closing";
-      }
-    }
-
-    if (track.status === "closing") {
-      const totalLen = (fest.preparationDays || 0) + (fest.durationDays || 1) + (fest.closingDays || 0);
-      if (phaseDay >= totalLen) {
+    if (!phase && track.status !== "completed" && track.status !== "cancelled") {
+      // Past end window → complete
+      if (day > (track.scheduledEndDay ?? day)) {
         completeFestival(store, data, track, fest, day);
       }
+      continue;
+    }
+
+    if (phase === "preparation" && track.status === "scheduled") {
+      enterPreparation(store, data, track, fest, day);
+    } else if (phase === "active" && (track.status === "scheduled" || track.status === "preparation")) {
+      if (track.status === "scheduled") enterPreparation(store, data, track, fest, day);
+      enterActive(store, data, track, fest, day);
+    } else if (phase === "closing" && track.status === "active") {
+      track.status = "closing";
+    } else if (phase === "closing" && track.status === "closing") {
+      // wait until past close window
+      const closeEnd =
+        activeStartTotalDay(y, entry) + (entry.durationDays || 1) + (entry.closingDays || 0) - 1;
+      if (day >= closeEnd) completeFestival(store, data, track, fest, day);
+    } else if (track.status === "active") {
+      tickActivities(track, fest);
+      if (fest.fastingAware && day % 2 === 0) {
+        applyFestivalDemand(fest, track.completedKeys, `eve_${day}`);
+      }
+    } else if (track.status === "closing") {
+      const closeEnd =
+        activeStartTotalDay(y, entry) + (entry.durationDays || 1) + (entry.closingDays || 0) - 1;
+      if (day >= closeEnd) completeFestival(store, data, track, fest, day);
     }
   }
 
-  store.activeFestivals = store.activeFestivals.filter((t) => t.status !== "completed" && t.status !== "cancelled");
+  store.activeFestivals = store.activeFestivals.filter(
+    (t) => t.status !== "completed" && t.status !== "cancelled"
+  );
   markDirty();
 }
 
-function startFestivalTrack(store, data, fest, day) {
+function startFestivalTrack(store, data, fest, entry, year, day, initialPhase) {
+  const prepStart = prepStartTotalDay(year, entry);
+  const activeStart = activeStartTotalDay(year, entry);
+  const endDay =
+    activeStart + (entry.durationDays || 1) + (entry.closingDays || 0) - 1;
   const track = {
-    id: `fest_${fest.id}_${day}`,
+    id: `fest_${fest.id}_y${year}`,
     festivalId: fest.id,
     name: fest.name,
     status: "scheduled",
-    startDay: day,
+    civilizationYear: year,
+    occurrenceKey: occurrenceKey(fest.id, year),
+    startDay: prepStart,
+    scheduledStartDay: activeStart,
+    scheduledEndDay: endDay,
     settlementId: "settlement_main",
     participantIds: [],
     activityProgress: {},
@@ -204,13 +202,102 @@ function startFestivalTrack(store, data, fest, day) {
     impact: {}
   };
   store.activeFestivals.push(track);
-  store.cooldowns[fest.id] = day;
   store.stats.festivalsHeld = (store.stats.festivalsHeld || 0) + 1;
   publish("FESTIVAL_SCHEDULED", {
     source: "culture",
-    metadata: { festivalId: fest.id, trackId: track.id }
+    metadata: { festivalId: fest.id, trackId: track.id, year }
   });
-  Logger.info(`Festival scheduled: ${fest.name}`);
+  Logger.info(`Festival scheduled: ${fest.name} year ${year}`);
+
+  if (initialPhase === "preparation") enterPreparation(store, data, track, fest, day);
+  else if (initialPhase === "active") {
+    enterPreparation(store, data, track, fest, day);
+    enterActive(store, data, track, fest, day);
+  } else if (initialPhase === "closing") {
+    enterPreparation(store, data, track, fest, day);
+    enterActive(store, data, track, fest, day);
+    track.status = "closing";
+  }
+  return track;
+}
+
+function syncTrackPhase(store, data, track, fest, entry, phase, day) {
+  if (phase === "preparation" && track.status === "scheduled") {
+    enterPreparation(store, data, track, fest, day);
+  } else if (phase === "active" && track.status !== "active") {
+    if (track.status === "scheduled") enterPreparation(store, data, track, fest, day);
+    if (track.status === "preparation") enterActive(store, data, track, fest, day);
+  } else if (phase === "closing" && track.status === "active") {
+    track.status = "closing";
+  }
+}
+
+function enterPreparation(store, data, track, fest, day) {
+  if (track.status === "preparation" || track.status === "active" || track.status === "closing") return;
+  track.status = "preparation";
+  try {
+    onFestivalPhase(fest.id, "preparation", { trackId: track.id });
+  } catch {
+    /* */
+  }
+  publish("FESTIVAL_PREPARATION_STARTED", {
+    source: "culture",
+    metadata: { festivalId: fest.id, trackId: track.id, year: track.civilizationYear }
+  });
+  applyFestivalDemand(fest, track.completedKeys, "prep");
+  try {
+    generateFestivalMissions(data, fest, track, "prep");
+  } catch {
+    /* */
+  }
+  if (data.social) {
+    reportEvent(data.social, {
+      type: "local_news",
+      headlineKey: `${fest.mediaKey || fest.id}_upcoming`,
+      severity: 2,
+      createdDay: Math.floor(Date.now() / 86400000)
+    });
+  }
+}
+
+function enterActive(store, data, track, fest, day) {
+  if (track.status === "active" || track.status === "closing") return;
+  track.status = "active";
+  track.participantIds = selectFestivalParticipants(data, fest);
+  applyFestivalDemand(fest, track.completedKeys, "active");
+  applyHappiness(data, track, fest);
+  try {
+    generateFestivalMissions(data, fest, track, "active");
+    const center = data.settlements?.settlements?.settlement_main?.center || { x: 0, y: 64, z: 0 };
+    if (!data.culture.decorations) data.culture.decorations = createDecorationStore();
+    const planned = planDecorations(data.culture.decorations, fest.id, center);
+    placeDecorationBatch(data.culture.decorations, planned);
+    busPublish("FESTIVAL_VISUALS_STARTED", { source: "culture", metadata: { festivalId: fest.id } });
+    try {
+      onFestivalPhase(fest.id, "active", { trackId: track.id });
+    } catch {
+      /* */
+    }
+  } catch (e) {
+    Logger.warn(`Festival visuals: ${e}`);
+  }
+  publish("FESTIVAL_STARTED", {
+    source: "culture",
+    metadata: {
+      festivalId: fest.id,
+      participants: track.participantIds.length,
+      year: track.civilizationYear
+    }
+  });
+  if (data.social) {
+    reportEvent(data.social, {
+      type: "local_news",
+      headlineKey: fest.mediaKey || fest.id,
+      severity: 3,
+      createdDay: Math.floor(Date.now() / 86400000)
+    });
+  }
+  mirrorWorldEvent(data, fest, track, day);
 }
 
 function selectFestivalParticipants(data, fest) {
@@ -276,17 +363,35 @@ function completeFestival(store, data, track, fest, day) {
     if (data.culture.decorations) {
       cleanupFestivalDecorations(data.culture.decorations, fest.id);
       busPublish("FESTIVAL_VISUALS_CLEARED", { source: "culture", metadata: { festivalId: fest.id } });
-      try { onFestivalPhase(fest.id, "completed", { trackId: track.id }); } catch { /* */ }
+      try {
+        onFestivalPhase(fest.id, "completed", { trackId: track.id });
+      } catch {
+        /* */
+      }
     }
     generateFestivalMissions(data, fest, track, "cleanup");
-  } catch (e) { Logger.warn(`Festival cleanup: ${e}`); }
+  } catch (e) {
+    Logger.warn(`Festival cleanup: ${e}`);
+  }
   track.impact.attendance = track.participantIds.length;
   track.impact.economicGoods = Object.keys(track.completedKeys).filter((k) => k.includes("demand"));
+
+  const year = track.civilizationYear || data.worldEvents?.calendar?.year || 1;
+  const key = track.occurrenceKey || occurrenceKey(fest.id, year);
+  if (!store.completedOccurrences) store.completedOccurrences = {};
+  store.completedOccurrences[key] = true;
+  // Bound completed map
+  const keys = Object.keys(store.completedOccurrences);
+  if (keys.length > MAX_COMPLETED_OCCURRENCES) {
+    for (const k of keys.slice(0, keys.length - MAX_COMPLETED_OCCURRENCES)) {
+      delete store.completedOccurrences[k];
+    }
+  }
 
   store.history.push({
     id: track.id,
     festivalId: fest.id,
-    year: data.worldEvents?.calendar?.year || 1,
+    year,
     settlementId: track.settlementId,
     attendance: track.participantIds.length,
     outcome: "completed",
@@ -299,15 +404,15 @@ function completeFestival(store, data, track, fest, day) {
 
   publish("FESTIVAL_COMPLETED", {
     source: "culture",
-    metadata: { festivalId: fest.id, attendance: track.participantIds.length }
+    metadata: { festivalId: fest.id, attendance: track.participantIds.length, year }
   });
   rememberCivilization("festival_completed", {
     festivalId: fest.id,
     attendance: track.participantIds.length,
-    year: data.worldEvents?.calendar?.year
+    year
   });
   for (const id of track.participantIds.slice(0, 25)) {
-    addCitizenMemory(id, "festival_participated", { festivalId: fest.id });
+    addCitizenMemory(id, "festival_participated", { festivalId: fest.id, year });
   }
   if (data.social?.opinion && fest.effects?.opinion) {
     const d = Math.max(-5, Math.min(5, fest.effects.opinion));
@@ -347,12 +452,42 @@ export function listActiveFestivals() {
 }
 
 export function listUpcomingFestivals(calendar) {
-  if (!calendar) return [];
-  const doy = calendar.dayOfYear;
-  return listFestivals()
-    .filter((f) => f.dayOfYear >= doy)
-    .sort((a, b) => a.dayOfYear - b.dayOfYear)
-    .slice(0, 8);
+  return listUpcomingFromCalendar(calendar, 8);
+}
+
+/** Rich calendar lines for !cc calendar */
+export function festivalCalendarLines(calendar) {
+  if (!calendar) return ["Calendar unavailable"];
+  const lines = [
+    `CivilCraft Year ${calendar.year}`,
+    `Day ${calendar.dayOfYear} / 120 · ${calendar.season || ""} · ${calendar.weekday || ""}`
+  ];
+  const active = listActiveFestivals();
+  if (active.length) {
+    for (const t of active) {
+      const entry = getScheduleEntry(t.festivalId);
+      const dayNum =
+        entry && t.status === "active"
+          ? Math.max(1, (calendar.totalDays || 0) - activeStartTotalDay(t.civilizationYear || calendar.year, entry) + 1)
+          : 0;
+      const dur = entry?.durationDays || 1;
+      lines.push(
+        `Active: ${t.name || t.festivalId} (${t.status})${t.status === "active" ? ` Day ${dayNum}/${dur}` : ""}`
+      );
+    }
+  } else {
+    lines.push("Active Festival: none");
+  }
+  const upcoming = listUpcomingFromCalendar(calendar, 5);
+  if (upcoming.length) {
+    lines.push("Upcoming:");
+    for (const u of upcoming) {
+      lines.push(
+        `  ${u.name} — Day ${u.startDayOfYear} (prep ${u.preparationDayOfYear})${u.year > calendar.year ? " next year" : ""}`
+      );
+    }
+  }
+  return lines;
 }
 
 export function playerJoinFestival(citizenId, trackId) {

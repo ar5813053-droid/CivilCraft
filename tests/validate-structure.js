@@ -139,6 +139,7 @@ const required = [
   "behavior_pack/scripts/events/event-manager.js",
   "behavior_pack/scripts/culture/culture-data.js",
   "behavior_pack/scripts/culture/festival-registry.js",
+  "behavior_pack/scripts/culture/festival-calendar.js",
   "behavior_pack/scripts/culture/cultural-preferences.js",
   "behavior_pack/scripts/culture/festival-economy.js",
   "behavior_pack/scripts/culture/festival-activities.js",

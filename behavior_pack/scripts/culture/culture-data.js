@@ -1,6 +1,7 @@
-export const CULTURE_VERSION = 2;
+export const CULTURE_VERSION = 3;
 export const MAX_CULTURE_HISTORY = 80;
 export const MAX_ACTIVE_FESTIVAL_TRACK = 20;
+export const MAX_COMPLETED_OCCURRENCES = 200;
 
 export function createDefaultCulture() {
   return {
@@ -9,6 +10,8 @@ export function createDefaultCulture() {
     activeFestivals: [],
     history: [],
     cooldowns: {},
+    /** Keys: "festivalId:y{year}" — allows same festival next year */
+    completedOccurrences: {},
     impact: {},
     decorations: { records: [], cursor: 0 },
     addonEnabled: { holi: true, diwali: true, ramadan: true, eid: true, christmas: true },
@@ -23,6 +26,10 @@ export function createDefaultCulture() {
 export function normalizeCulture(raw) {
   const base = createDefaultCulture();
   if (!raw || typeof raw !== "object") return base;
+  const completed =
+    raw.completedOccurrences && typeof raw.completedOccurrences === "object"
+      ? raw.completedOccurrences
+      : {};
   return {
     version: Math.max(CULTURE_VERSION, raw.version || 1),
     preferences: raw.preferences && typeof raw.preferences === "object" ? raw.preferences : {},
@@ -31,6 +38,7 @@ export function normalizeCulture(raw) {
       : [],
     history: Array.isArray(raw.history) ? raw.history.slice(-MAX_CULTURE_HISTORY) : [],
     cooldowns: raw.cooldowns && typeof raw.cooldowns === "object" ? raw.cooldowns : {},
+    completedOccurrences: completed,
     impact: raw.impact && typeof raw.impact === "object" ? raw.impact : {},
     decorations: raw.decorations && typeof raw.decorations === "object" ? raw.decorations : { records: [], cursor: 0 },
     addonEnabled: raw.addonEnabled && typeof raw.addonEnabled === "object" ? raw.addonEnabled : { holi: true, diwali: true, ramadan: true, eid: true, christmas: true },
