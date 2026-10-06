@@ -189,3 +189,10 @@ Each phase should ship with:
 - Bread meals
 - Demand recording
 - Hunger recovery without a second inventory
+
+## Phase 12 — Employment & Labor Market ✅
+
+- Employment records and job matching
+- Job-search cooldowns
+- Private salary only when employer can pay
+- No duplicate government payroll

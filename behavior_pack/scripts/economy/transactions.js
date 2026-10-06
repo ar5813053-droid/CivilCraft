@@ -31,6 +31,7 @@ export const TxType = Object.freeze({
   BUDGET_TRANSFER: "budget_transfer",
   LEGAL_FINE: "legal_fine",
   GOVERNMENT_SALARY: "government_salary",
+  EMPLOYMENT_SALARY: "employment_salary",
   POLICE_EXPENSE: "police_expense",
   EMERGENCY_EXPENSE: "emergency_expense",
   MEDICAL_EXPENSE: "medical_expense",

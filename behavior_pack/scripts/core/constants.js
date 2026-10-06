@@ -37,7 +37,7 @@ export const DEBUG = true;
 export const DEFAULT_JOB_ID = "citizen";
 
 /** Phase identifier for future migration logic. */
-export const PHASE = 11;
+export const PHASE = 12;
 
 /** How often the economy simulation runs (ticks). ~15s */
 export const ECONOMY_INTERVAL_TICKS = 300;

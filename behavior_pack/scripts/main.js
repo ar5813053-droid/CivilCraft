@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 11 Citizen Consumption).
+ * CivilCraft — entry point (Phase 12 Employment).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -60,8 +60,10 @@ import { initializeDailyLife, formatDailyLines, getDailyLife } from "./dailylife
 import { ROUTINES } from "./dailylife/routines.js";
 import { getHouseholdFoodStatus, evaluateHouseholdFood } from "./dailylife/food.js";
 import { evaluateCitizenConsumption, getConsumptionStatus } from "./dailylife/consumption.js";
+import { initializeEmployment, formatEmploymentLines, getEmploymentStore, hireCitizen } from "./employment/employment-manager.js";
+import { getAllJobs } from "./jobs/job-registry.js";
 
-Logger.info("CivilCraft Phase 11 loading…");
+Logger.info("CivilCraft Phase 12 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -79,6 +81,7 @@ initializeInfrastructure();
 initializeHousing();
 initializePopulation();
 initializeDailyLife();
+initializeEmployment();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -656,6 +659,48 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           break;
         }
 
+
+        case "employment":
+        case "unemployment": {
+          const lines = formatEmploymentLines(args[1]);
+          for (const line of lines) player.sendMessage(line);
+          break;
+        }
+
+        case "jobs": {
+          if (args[1] === "available") {
+            const opens = getEmploymentStore().opportunities || [];
+            player.sendMessage(opens.map((o) => `${o.jobId}:${o.open}`).join(", ") || "§7None");
+            break;
+          }
+          player.sendMessage(getAllJobs().map((j) => j.id).join(", "));
+          break;
+        }
+
+        case "hire": {
+          const villager = getAllVillagers().find((v) => v.id === args[1]);
+          if (!villager || !args[2]) {
+            player.sendMessage("§cUsage: !cc hire <villagerId> <jobId>");
+            break;
+          }
+          const result = hireCitizen(getEmploymentStore(), {
+            villager,
+            jobId: args[2],
+            employerType: "self_employed",
+            employerId: "self_" + args[2],
+            dayStamp: Math.floor(Date.now() / 86400000),
+            educationLevel: "none",
+            health: 80,
+            force: true
+          });
+          player.sendMessage(result.ok ? "§aHired" : `§c${result.error}`);
+          break;
+        }
+
+        case "payroll":
+          player.sendMessage(`§7Unpaid ${getEmploymentStore().unpaid?.length || 0}`);
+          break;
+
         case "consume": {
           const villager = getAllVillagers().find((v) => v.id === args[1]) || getAllVillagers()[0];
           if (!villager) {
@@ -687,4 +732,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 11 ready.");
+Logger.info("CivilCraft Phase 12 ready.");

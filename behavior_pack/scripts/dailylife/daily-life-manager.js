@@ -13,6 +13,8 @@ import { pushDailyEvent } from "./daily-life-events.js";
 import { dailyStats } from "./daily-life-stats.js";
 import { evaluateHouseholdFood } from "./food.js";
 import { evaluateCitizenConsumption } from "./consumption.js";
+import { getEmploymentStore } from "../employment/employment-manager.js";
+import { getEmploymentSnapshot } from "../employment/employment-records.js";
 
 export const DAILY_INTERVAL_TICKS = 600;
 const BATCH = 40;
@@ -67,17 +69,19 @@ function evaluateBatch(data) {
     const state = ensureState(store, villager.id);
     state.needs = tickNeeds(state.needs, state.activity);
     const household = (data.population?.households || []).find((h) => h.memberIds?.includes(villager.id));
+    const employment = getEmploymentSnapshot(getEmploymentStore(), villager.id);
+    const jobId = employment.jobId || (villager.profession !== "citizen" ? villager.profession : null);
     applyDecision(state, {
       health: state.needs.health,
       hunger: state.needs.hunger,
       energy: state.needs.energy,
       social: state.needs.social,
       houseId: household?.houseId || null,
-      workScheduled: hour >= 8 && hour < 17 && villager.profession && villager.profession !== "citizen",
+      workScheduled: hour >= 8 && hour < 17 && employment.employed,
       schoolScheduled: hour >= 8 && hour < 16 && (villager.lifeStage === "child" || villager.lifeStage === "teenager"),
-      jobId: villager.profession,
-      unemployed: !villager.profession || villager.profession === "citizen",
-      workingAge: villager.lifeStage === "adult" || villager.lifeStage === "young_adult",
+      jobId,
+      unemployed: !employment.employed,
+      workingAge: villager.lifeStage === "adult" || villager.lifeStage === "young_adult" || villager.lifeStage === "middle_aged",
       hour,
       clinicId: "central_clinic",
       schoolId: "central_school"
@@ -85,7 +89,7 @@ function evaluateBatch(data) {
     if (state.activity === "shopping" && canShop(state, day)) state.shoppingDay = day;
     state.happiness = happinessScore(state.needs, state.happiness);
     state.stress = stressScore({
-      unemployed: !villager.profession || villager.profession === "citizen",
+      unemployed: !employment.employed,
       homeless: !household?.houseId,
       hunger: state.needs.hunger,
       health: state.needs.health

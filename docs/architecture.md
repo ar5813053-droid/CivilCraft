@@ -232,3 +232,7 @@ Daily life asks Economy to buy wheat when household stock is low and hunger is b
 ## Consumption (Phase 11)
 
 Bread is the consumable food. Wheat stays an ingredient. Meals call consumeOwnGoods and recordDemand. Hunger decay remains in tickNeeds. One meal per citizen per day. World data version is 11.
+
+## Employment (Phase 12)
+
+Employment owns assignment state only. Jobs own definitions and schedules. Education is read for eligibility. Economy owns money transfers. Police payroll remains in the police module. Soft vacancy caps prevent unbounded hiring. Unemployed adults search every 2 simulated days. Batch size is 40. World data version is 12.
