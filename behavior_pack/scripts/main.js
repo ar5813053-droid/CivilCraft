@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Player Citizen & Banking).
+ * CivilCraft — entry point (Living Civilization Master).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -76,6 +76,11 @@ import { initializeAppearance } from "./appearance/appearance-manager.js";
 import { initializeBanking, getBankingStore, openAccount, deposit, withdraw, transfer, getAccount, statementLines } from "./banking/banking-manager.js";
 import { initializePlayerSystem, getOrCreateProfile, formatProfile, playerBuy, playerSell, getPlayersStore } from "./player/player-manager.js";
 import { initializePlayerJobs, listAvailableJobs, listNearbyEmployers, applyForJob, quitJob, jobStatus, playerMissions, doAcceptMission, doCompleteMission, doAbandonMission, getPlayerJobsStore } from "./playerjobs/player-job-manager.js";
+import { initializeMemory, listCivilizationMemories } from "./memory/memory-manager.js";
+import { initializeEvents, getEventsStore, scheduleEvent } from "./events/event-manager.js";
+import { initializeCulture, getCultureStore } from "./culture/festival-manager.js";
+import { initializeAi, getAiStore } from "./ai/behavior-engine.js";
+import { wireCivilizationReactions } from "./civilization/reaction-engine.js";
 import { getBalance } from "./economy/wallet.js";
 import { getAllShops } from "./economy/shops.js";
 import { selectAppearance } from "./civilization/appearance.js";
@@ -115,6 +120,11 @@ initializeAppearance();
 initializeBanking();
 initializePlayerSystem();
 initializePlayerJobs();
+initializeMemory();
+initializeEvents();
+initializeCulture();
+initializeAi();
+wireCivilizationReactions();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -826,9 +836,30 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           player.sendMessage(`emp ${data.employment?.stats?.employed||0} shops ${(data.economy&&data.economy.shops)?Object.keys(data.economy.shops).length:0}`);
           break;
         }
+
+        case "culture":
+        case "calendar":
+        case "festivals": {
+          const c = getCultureStore();
+          player.sendMessage(`§6Year ${c.year} day ${c.calendarDay}`);
+          for (const f of (c.activeFestivals || []).slice(0, 5)) player.sendMessage(`Festival ${f.nameKey}`);
+          break;
+        }
+        case "events": {
+          const es = getEventsStore();
+          player.sendMessage(`Active-ish events ${es.events.length} history ${es.history.length}`);
+          break;
+        }
+        case "memory": {
+          for (const m of listCivilizationMemories(8)) player.sendMessage(`${m.type} d${m.day}`);
+          break;
+        }
+
         case "civilization":
         case "world": {
           for (const line of formatCivilizationLines()) player.sendMessage(line);
+          const civ = getCivilizationStore();
+          if (civ.scoreReasons) for (const r of civ.scoreReasons.slice(0, 5)) player.sendMessage(`§7${r}`);
           break;
         }
         case "events":

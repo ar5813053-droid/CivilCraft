@@ -5,7 +5,7 @@
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
 > **Current status:** Phase 21 — Final Civilization  
-> Version: `1.23.0`  
+> Version: `1.24.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -226,6 +226,7 @@ node tests/banking/banking.test.js
 node tests/player/player-citizen.test.js
 node tests/player/player-economy.test.js
 node tests/playerjobs/player-jobs.test.js
+node tests/living/living-civilization.test.js
 ```
 
 Static/structure tests only — in-game behavior requires a Bedrock client.
@@ -301,3 +302,12 @@ Players receive a CivilCraft profile (wallet + bank account). Commands: `!cc pro
 ## Player Jobs & Missions
 
 `!cc jobs`, `!cc job apply <id>`, `!cc job missions`, `!cc mission accept|complete`. Missions affect shop stock, cases, health, education. Salary/rewards paid from employer funds only. World data **23**.
+
+## Living Civilization Expansion
+
+- **Memory** — bounded citizen/civilization event memory
+- **Events** — scheduled → active → completed lifecycle + event bus
+- **Culture** — in-game calendar and multi-day festivals (generic cultural themes)
+- **AI** — deterministic personalities and goals (batched)
+- **Score 2.0** — component breakdown + reasons
+- World data version **24**

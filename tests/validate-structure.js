@@ -112,6 +112,18 @@ const required = [
   "behavior_pack/scripts/playerjobs/player-job-manager.js",
   "behavior_pack/scripts/playerjobs/job-missions.js",
   "behavior_pack/scripts/playerjobs/player-payroll.js",
+  "behavior_pack/scripts/memory/memory-data.js",
+  "behavior_pack/scripts/memory/memory-manager.js",
+  "behavior_pack/scripts/events/event-bus.js",
+  "behavior_pack/scripts/events/event-data.js",
+  "behavior_pack/scripts/events/event-manager.js",
+  "behavior_pack/scripts/culture/culture-data.js",
+  "behavior_pack/scripts/culture/festival-manager.js",
+  "behavior_pack/scripts/ai/personality-data.js",
+  "behavior_pack/scripts/ai/behavior-engine.js",
+  "behavior_pack/scripts/civilization/score-v2.js",
+  "behavior_pack/scripts/civilization/reaction-engine.js",
+
 
 
   "behavior_pack/scripts/politics/candidate-seeding.js",

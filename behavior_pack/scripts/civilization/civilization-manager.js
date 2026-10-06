@@ -4,6 +4,8 @@ import { getWorldData, markDirty } from "../core/data-store.js";
 import { createDefaultCivilization, normalizeCivilization } from "./civilization-data.js";
 import { computeCivilizationStats, computeCivilizationScore } from "./civilization-score.js";
 import { detectWorldEvents } from "./world-events.js";
+import { computeScoreV2 } from "./score-v2.js";
+import { publish } from "../events/event-bus.js";
 
 export const CIVILIZATION_INTERVAL_TICKS = 2400;
 let initialized = false;
@@ -37,8 +39,12 @@ export function tickCivilization(data) {
   const day = Math.floor(Date.now() / 86400000);
   const stats = computeCivilizationStats(data);
   store.stats = stats;
-  store.score = computeCivilizationScore(stats);
+  const v2 = computeScoreV2(data);
+  store.score = v2.score;
+  store.scoreReasons = v2.reasons;
+  store.scoreComponents = v2.components;
   detectWorldEvents(store, stats, data.social, day);
+  if ((stats.foodAvailability || 100) < 25) publish("FOOD_SHORTAGE", { day, food: stats.foodAvailability });
   store.lastComputedDay = day;
   markDirty();
 }

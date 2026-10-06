@@ -268,3 +268,7 @@ Player profiles mirror citizen wallets using Economy credit/debit. Bank accounts
 ## Player Jobs
 
 hireCitizen accepts player profile ids. Missions generated from shops/justice/healthcare state. completeMission mutates inventories/cases; payMissionReward debits employer.
+
+## Living Civilization
+
+Event bus publishes FOOD_SHORTAGE, FESTIVAL_*, EVENT_*. Memory records major events. Culture advances a 120-day year with festival definitions. AI assigns goals in batches of 30. Score 2.0 explains component contributions.
