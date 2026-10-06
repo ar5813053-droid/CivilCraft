@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phases 18-19 Politics and Nations).
+ * CivilCraft — entry point (Phase 20 Advanced Civilization).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -71,12 +71,14 @@ import { initializeSocial, getSocialStore } from "./social/social-manager.js";
 import { initializePolitics, getPoliticsStore } from "./politics/politics-manager.js";
 import { listParties } from "./politics/parties.js";
 import { initializeNations, getNationsStore } from "./nations/nation-manager.js";
+import { initializeCivilization, getCivilizationStore, formatCivilizationLines } from "./civilization/civilization-manager.js";
+import { selectAppearance } from "./civilization/appearance.js";
 import { listNations, getNation } from "./nations/nation-registry.js";
 import { getRelation } from "./nations/diplomacy.js";
 import { getShop, getAllShops } from "./economy/shops.js";
 import { getAllJobs } from "./jobs/job-registry.js";
 
-Logger.info("CivilCraft Phases 18-19 loading…");
+Logger.info("CivilCraft Phase 20 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -102,6 +104,7 @@ initializeUtilities();
 initializeSocial();
 initializePolitics();
 initializeNations();
+initializeCivilization();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -683,6 +686,21 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
 
 
 
+
+        case "civilization":
+        case "world": {
+          for (const line of formatCivilizationLines()) player.sendMessage(line);
+          break;
+        }
+        case "events":
+          player.sendMessage(`§7World events ${getCivilizationStore().events.length}`);
+          break;
+        case "appearance": {
+          const v = getAllVillagers().find((x) => x.id === args[1]) || getAllVillagers()[0];
+          player.sendMessage(v ? selectAppearance(v) : "§cNo villager");
+          break;
+        }
+
         case "politics":
         case "parties":
           player.sendMessage((getPoliticsStore().parties || []).map((p) => p.id).join(", "));
@@ -822,4 +840,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phases 18-19 ready.");
+Logger.info("CivilCraft Phase 20 ready.");

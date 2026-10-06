@@ -252,3 +252,7 @@ Parties and elections update Government leadership via appoint(). Tax rate polic
 ## Nations (Phase 19)
 
 nation_main wraps existing settlement/government. Relations -100..100. Treaties and trade orders; shipments use Phase 15 logistics. No warfare. Cap 10 nations.
+
+## Phase 20 — Advanced Civilization
+
+Civilization manager aggregates employment, housing, food, health, education, utilities, approval, and prosperity into a 0–100 score. World events fire only from thresholds with multi-day cooldowns. Appearance keys map jobs to original resource-pack textures. Simulation tiers FULL/LIGHT/BACKGROUND orchestrate intensity without replacing Daily Life.

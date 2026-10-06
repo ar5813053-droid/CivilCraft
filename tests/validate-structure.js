@@ -96,6 +96,14 @@ const required = [
   "behavior_pack/scripts/nations/nation-registry.js",
   "behavior_pack/scripts/nations/diplomacy.js",
   "behavior_pack/scripts/nations/international-trade.js",
+  "behavior_pack/scripts/civilization/civilization-data.js",
+  "behavior_pack/scripts/civilization/civilization-manager.js",
+  "behavior_pack/scripts/civilization/civilization-score.js",
+  "behavior_pack/scripts/civilization/world-events.js",
+  "behavior_pack/scripts/civilization/simulation-tiers.js",
+  "behavior_pack/scripts/civilization/appearance.js",
+  "assets/LICENSES.md",
+
 
 
   "behavior_pack/scripts/economy/economy-manager.js",

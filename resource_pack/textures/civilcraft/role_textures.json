@@ -1,0 +1,20 @@
+{
+  "civilcraft_farmer": "textures/civilcraft/roles/civilcraft_farmer",
+  "civilcraft_worker": "textures/civilcraft/roles/civilcraft_worker",
+  "civilcraft_builder": "textures/civilcraft/roles/civilcraft_builder",
+  "civilcraft_trader": "textures/civilcraft/roles/civilcraft_trader",
+  "civilcraft_doctor": "textures/civilcraft/roles/civilcraft_doctor",
+  "civilcraft_nurse": "textures/civilcraft/roles/civilcraft_nurse",
+  "civilcraft_teacher": "textures/civilcraft/roles/civilcraft_teacher",
+  "civilcraft_police": "textures/civilcraft/roles/civilcraft_police",
+  "civilcraft_emergency": "textures/civilcraft/roles/civilcraft_emergency",
+  "civilcraft_mayor": "textures/civilcraft/roles/civilcraft_mayor",
+  "civilcraft_leader": "textures/civilcraft/roles/civilcraft_leader",
+  "civilcraft_soldier": "textures/civilcraft/roles/civilcraft_soldier",
+  "civilcraft_student": "textures/civilcraft/roles/civilcraft_student",
+  "civilcraft_civilian": "textures/civilcraft/roles/civilcraft_civilian",
+  "civilcraft_civilian_a": "textures/civilcraft/roles/civilcraft_civilian_a",
+  "civilcraft_civilian_b": "textures/civilcraft/roles/civilcraft_civilian_b",
+  "civilcraft_civilian_c": "textures/civilcraft/roles/civilcraft_civilian_c",
+  "civilcraft_civilian_d": "textures/civilcraft/roles/civilcraft_civilian_d"
+}
