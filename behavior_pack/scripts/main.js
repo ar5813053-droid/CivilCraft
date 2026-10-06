@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phase 12 Employment).
+ * CivilCraft — entry point (Phase 13 Business Operations).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -61,9 +61,11 @@ import { ROUTINES } from "./dailylife/routines.js";
 import { getHouseholdFoodStatus, evaluateHouseholdFood } from "./dailylife/food.js";
 import { evaluateCitizenConsumption, getConsumptionStatus } from "./dailylife/consumption.js";
 import { initializeEmployment, formatEmploymentLines, getEmploymentStore, hireCitizen } from "./employment/employment-manager.js";
+import { initializeBusinessOperations, formatBusinessLines, runShopPayroll, ensureBusinessOps, getVacancies } from "./economy/business-operations.js";
+import { getShop, getAllShops } from "./economy/shops.js";
 import { getAllJobs } from "./jobs/job-registry.js";
 
-Logger.info("CivilCraft Phase 12 loading…");
+Logger.info("CivilCraft Phase 13 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -82,6 +84,7 @@ initializeHousing();
 initializePopulation();
 initializeDailyLife();
 initializeEmployment();
+initializeBusinessOperations();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -660,6 +663,35 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
         }
 
 
+
+        case "business": {
+          if (args[1] === "payroll" && args[2]) {
+            const shop = getShop(args[2]);
+            if (!shop) { player.sendMessage("§cNo shop"); break; }
+            const result = runShopPayroll(shop, { employment: getEmploymentStore(), villagers: Object.fromEntries(getAllVillagers().map(v => [v.id, v])) }, Math.floor(Date.now() / 86400000), true);
+            player.sendMessage(`paid ${result.paid} unpaid ${result.unpaid}`);
+            break;
+          }
+          if (args[1] === "employees" && args[2]) {
+            const shop = getShop(args[2]);
+            player.sendMessage((shop?.employeeVillagerIds || []).join(", ") || "§7None");
+            break;
+          }
+          if (args[1] === "finance" && args[2]) {
+            const lines = formatBusinessLines(args[2]);
+            for (const line of lines) player.sendMessage(line);
+            break;
+          }
+          if (args[1] === "vacancies" && args[2]) {
+            const shop = getShop(args[2]);
+            player.sendMessage(shop ? `vac ${getVacancies(shop)}` : "§cNo shop");
+            break;
+          }
+          const lines = formatBusinessLines(args[1]);
+          for (const line of lines) player.sendMessage(line);
+          break;
+        }
+
         case "employment":
         case "unemployment": {
           const lines = formatEmploymentLines(args[1]);
@@ -732,4 +764,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phase 12 ready.");
+Logger.info("CivilCraft Phase 13 ready.");

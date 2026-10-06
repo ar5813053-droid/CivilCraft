@@ -70,6 +70,7 @@ const required = [
   "behavior_pack/scripts/economy/consumption.js",
   "behavior_pack/scripts/economy/shops.js",
   "behavior_pack/scripts/economy/businesses.js",
+  "behavior_pack/scripts/economy/business-operations.js",
   "behavior_pack/scripts/economy/economy-manager.js",
   "behavior_pack/scripts/government/government-data.js",
   "behavior_pack/scripts/government/government-manager.js",

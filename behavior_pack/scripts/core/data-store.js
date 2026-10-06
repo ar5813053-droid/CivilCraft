@@ -38,7 +38,7 @@ import { safeJsonParse } from "./utils.js";
  */
 
 const DEFAULT_WORLD_DATA = () => ({
-  version: 12,
+  version: 13,
   villagers: {},
   households: {},
   villages: {},
@@ -74,7 +74,7 @@ export function loadWorldData() {
       const parsed = safeJsonParse(raw, null);
       if (parsed && typeof parsed === "object" && parsed.version) {
         cache = {
-          version: parsed.version ?? 12,
+          version: parsed.version ?? 13,
           villagers: parsed.villagers ?? {},
           households: parsed.households ?? {},
           villages: parsed.villages ?? {},

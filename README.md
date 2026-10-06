@@ -4,8 +4,8 @@
 
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
-> **Current status:** Phase 12 — Employment & Labor Market  
-> Version: `1.11.0`  
+> **Current status:** Phase 13 — Business Operations  
+> Version: `1.12.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -212,6 +212,7 @@ node tests/dailylife/daily-life.test.js
 node tests/dailylife/food.test.js
 node tests/dailylife/consumption.test.js
 node tests/employment/employment.test.js
+node tests/economy/business-operations.test.js
 ```
 
 Static/structure tests only — in-game behavior requires a Bedrock client.
@@ -255,3 +256,7 @@ Citizens eat bread through consumeOwnGoods. Hunger rises by 40 in daily-life nee
 ## Phase 12 Features (Employment)
 
 Employment records, deterministic job matching, and job-search cooldowns. Police/teacher/medical jobs stay on their modules. Government salaries are not paid twice. Business payroll uses shop balance only. World data version is 12.
+
+## Phase 13 Features (Business Operations)
+
+Shops have employee capacity, vacancies, revenue, maintenance, and private payroll every 7 simulated days. Government and police salaries are never paid here. World data version is 13.

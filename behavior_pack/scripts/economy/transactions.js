@@ -200,12 +200,17 @@ export function purchaseGoods(opts) {
   });
   recordTransaction(record);
 
-  // Aggregate counters
+  // Aggregate counters + shop revenue accounting
   try {
     const eco = getWorldData().economy;
     if (eco) {
       eco.totals.totalPurchases = (eco.totals.totalPurchases || 0) + total;
       eco.totals.totalSales = (eco.totals.totalSales || 0) + total;
+    }
+    if (seller && typeof seller.revenue === "number") {
+      seller.revenue = Math.max(0, Math.floor((seller.revenue || 0) + total));
+    } else if (seller && seller.type && typeof seller.balance === "number") {
+      seller.revenue = Math.max(0, Math.floor(total));
     }
   } catch {
     /* ignore */

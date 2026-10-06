@@ -236,3 +236,7 @@ Bread is the consumable food. Wheat stays an ingredient. Meals call consumeOwnGo
 ## Employment (Phase 12)
 
 Employment owns assignment state only. Jobs own definitions and schedules. Education is read for eligibility. Economy owns money transfers. Police payroll remains in the police module. Soft vacancy caps prevent unbounded hiring. Unemployed adults search every 2 simulated days. Batch size is 40. World data version is 12.
+
+## Business Operations (Phase 13)
+
+Existing shops are the private employers. Capacity is by type (food 5, general 4, etc.). Sales through purchaseGoods increase shop revenue. Maintenance is a small daily debit. Private payroll runs every 7 simulated days via transferMoney and never pays government or police roles. World data version is 13.

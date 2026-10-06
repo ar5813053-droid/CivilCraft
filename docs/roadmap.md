@@ -196,3 +196,11 @@ Each phase should ship with:
 - Job-search cooldowns
 - Private salary only when employer can pay
 - No duplicate government payroll
+
+## Phase 13 — Business Operations & Private Payroll ✅
+
+- Shop employee capacity and vacancies
+- Revenue from real purchases
+- Maintenance expenses
+- Automatic private payroll (7-day period)
+- Government payroll isolation

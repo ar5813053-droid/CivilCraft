@@ -47,6 +47,7 @@ export function createShop(opts) {
   const type = opts.type || SHOP_TYPES.GENERAL;
   const id = generateId("shop");
   /** @type {ShopRecord} */
+  const capacityByType = { general: 4, food: 5, building: 5, tools: 4 };
   const shop = {
     id,
     type,
@@ -57,6 +58,17 @@ export function createShop(opts) {
     inventory: { ...(DEFAULT_STOCK[type] || DEFAULT_STOCK.general) },
     priceOverrides: {},
     open: true,
+    active: true,
+    employeeCapacity: capacityByType[type] ?? 4,
+    employeeVillagerIds: [],
+    revenue: 0,
+    operatingExpenses: 0,
+    payrollExpense: 0,
+    profit: 0,
+    lastOperatingDay: null,
+    lastPayrollDay: null,
+    unpaidPayroll: [],
+    financialStatus: "healthy",
     createdAt: Date.now(),
     lastUpdated: Date.now()
   };
@@ -87,6 +99,18 @@ export function hydrateShop(shop) {
   if (!shop) return shop;
   shop.balance = sanitizeMoney(shop.balance);
   if (!shop.inventory) shop.inventory = {};
+  if (typeof shop.employeeCapacity !== "number") {
+    const capacityByType = { general: 4, food: 5, building: 5, tools: 4 };
+    shop.employeeCapacity = capacityByType[shop.type] ?? 4;
+  }
+  if (!Array.isArray(shop.employeeVillagerIds)) shop.employeeVillagerIds = [];
+  if (typeof shop.revenue !== "number") shop.revenue = 0;
+  if (typeof shop.operatingExpenses !== "number") shop.operatingExpenses = 0;
+  if (typeof shop.payrollExpense !== "number") shop.payrollExpense = 0;
+  if (typeof shop.profit !== "number") shop.profit = 0;
+  if (shop.active == null) shop.active = shop.open !== false;
+  if (shop.financialStatus == null) shop.financialStatus = "healthy";
+  if (!Array.isArray(shop.unpaidPayroll)) shop.unpaidPayroll = [];
   if (!Object.getOwnPropertyDescriptor(shop, "money")?.get) {
     Object.defineProperty(shop, "money", {
       get() {
