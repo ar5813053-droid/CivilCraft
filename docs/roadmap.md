@@ -209,3 +209,6 @@ Each phase should ship with:
 ## Phase 15 — Transportation & Logistics ✅
 ## Phase 16 — Utilities & Public Services ✅
 ## Phase 17 — Media, Social Life & Public Opinion ✅
+
+## Phase 18 — Politics, Elections & National Government ✅
+## Phase 19 — Multiple Nations, Diplomacy & International Economy ✅

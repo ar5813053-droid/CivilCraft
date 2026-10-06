@@ -4,8 +4,8 @@
 
 CivilCraft turns vanilla villagers into persistent citizens with identities, jobs, households, daily schedules, and a living economy.
 
-> **Current status:** Phases 14–17 — Production, Logistics, Utilities, Social  
-> Version: `1.16.0`  
+> **Current status:** Phases 18–19 — Politics & Nations  
+> Version: `1.18.0`  
 > Target: Minecraft Bedrock 1.21+
 
 ---
@@ -217,6 +217,8 @@ node tests/economy/production-business.test.js
 node tests/logistics/logistics.test.js
 node tests/utilities/utilities.test.js
 node tests/social/social.test.js
+node tests/politics/politics.test.js
+node tests/nations/nations.test.js
 ```
 
 Static/structure tests only — in-game behavior requires a Bedrock client.
@@ -273,3 +275,10 @@ Shops have employee capacity, vacancies, revenue, maintenance, and private payro
 - **17 Social**: Aggregate public opinion and media events from real simulation state.
 
 World data version is **17**.
+
+## Phases 18–19
+
+- **18 Politics**: Parties, candidates, elections, policy knobs on government tax/priorities.
+- **19 Nations**: nation_main migration, diplomacy scores, treaties, trade orders via logistics.
+
+World data version is **19**.

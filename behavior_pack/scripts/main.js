@@ -1,5 +1,5 @@
 /**
- * CivilCraft — entry point (Phases 14-17 Civilization Systems).
+ * CivilCraft — entry point (Phases 18-19 Politics and Nations).
  *
  * Responsibilities:
  * - Bootstrap subsystems in dependency order
@@ -68,10 +68,15 @@ import { createRoute } from "./logistics/routes.js";
 import { createShipment } from "./logistics/shipments.js";
 import { initializeUtilities, getUtilitiesStore } from "./utilities/utilities-manager.js";
 import { initializeSocial, getSocialStore } from "./social/social-manager.js";
+import { initializePolitics, getPoliticsStore } from "./politics/politics-manager.js";
+import { listParties } from "./politics/parties.js";
+import { initializeNations, getNationsStore } from "./nations/nation-manager.js";
+import { listNations, getNation } from "./nations/nation-registry.js";
+import { getRelation } from "./nations/diplomacy.js";
 import { getShop, getAllShops } from "./economy/shops.js";
 import { getAllJobs } from "./jobs/job-registry.js";
 
-Logger.info("CivilCraft Phases 14-17 loading…");
+Logger.info("CivilCraft Phases 18-19 loading…");
 
 // --- Bootstrap ---
 loadWorldData();
@@ -95,6 +100,8 @@ initializeBusinessProduction();
 initializeLogistics();
 initializeUtilities();
 initializeSocial();
+initializePolitics();
+initializeNations();
 startSimulation();
 
 // --- Entity lifecycle ---
@@ -675,6 +682,35 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
 
 
 
+
+        case "politics":
+        case "parties":
+          player.sendMessage((getPoliticsStore().parties || []).map((p) => p.id).join(", "));
+          break;
+        case "election":
+          player.sendMessage(`§7Elections ${getPoliticsStore().elections.length}`);
+          break;
+        case "candidates":
+          player.sendMessage(`§7Candidates ${getPoliticsStore().candidates.length}`);
+          break;
+        case "nations":
+          player.sendMessage((getNationsStore().nations || []).map((n) => n.id).join(", "));
+          break;
+        case "diplomacy": {
+          const a = args[1] || "nation_main";
+          const b = args[2];
+          if (!b) { player.sendMessage(`§7Nations ${getNationsStore().nations.length}`); break; }
+          const rel = getRelation(getNationsStore(), a, b);
+          player.sendMessage(rel ? `${rel.score} ${rel.state}` : "§7neutral");
+          break;
+        }
+        case "treaties":
+          player.sendMessage(`§7Treaties ${getNationsStore().treaties.length}`);
+          break;
+        case "trade":
+          player.sendMessage(`§7Trade orders ${getNationsStore().tradeOrders.length}`);
+          break;
+
         case "logistics":
           player.sendMessage(`§7Routes ${getLogisticsStore().routes.length} shipments ${getLogisticsStore().shipments.length}`);
           break;
@@ -786,4 +822,4 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
   Logger.warn("chatSend event unavailable — debug commands disabled.");
 }
 
-Logger.info("CivilCraft Phases 14-17 ready.");
+Logger.info("CivilCraft Phases 18-19 ready.");

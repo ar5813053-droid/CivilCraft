@@ -244,3 +244,11 @@ Existing shops are the private employers. Capacity is by type (food 5, general 4
 ## Phases 14–17
 
 Production uses shared recipes and shop employees. Logistics moves goods between shops with travel days. Utilities compute settlement service quality. Social opinion is smoothed from employment, safety, health, education, and utilities. World data version is 17.
+
+## Politics (Phase 18)
+
+Parties and elections update Government leadership via appoint(). Tax rate policy is bounded 5–15%. Public opinion feeds vote scoring. World data version includes politics blob.
+
+## Nations (Phase 19)
+
+nation_main wraps existing settlement/government. Relations -100..100. Treaties and trade orders; shipments use Phase 15 logistics. No warfare. Cap 10 nations.
