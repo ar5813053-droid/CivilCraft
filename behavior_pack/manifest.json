@@ -2,38 +2,61 @@
   "format_version": 2,
   "header": {
     "name": "CivilCraft",
-    "description": "Villager Civilization Addon by ItsZack95 — living citizens, jobs, economy, government, politics, festivals, and more.",
+    "description": "Villager Civilization Addon by ItsZack95. Type !cc ping after loading.",
     "uuid": "2a27c2cc-b7d6-4ac4-9637-95c770a6d3be",
-    "version": [1, 29, 0],
-    "min_engine_version": [1, 21, 0]
+    "version": [
+      1,
+      30,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      20,
+      50
+    ]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "a5675c37-8de8-4772-bcb2-659a022ebc07",
-      "version": [1, 29, 0]
+      "version": [
+        1,
+        30,
+        0
+      ]
     },
     {
       "type": "script",
       "language": "javascript",
       "uuid": "b87bf419-e862-4f25-bfda-e461a03f64ba",
-      "version": [1, 29, 0],
+      "version": [
+        1,
+        30,
+        0
+      ],
       "entry": "scripts/main.js"
     }
   ],
   "dependencies": [
     {
       "uuid": "9296565a-743a-4368-9426-d469027a5956",
-      "version": [1, 29, 0]
+      "version": [
+        1,
+        30,
+        0
+      ]
     },
     {
       "module_name": "@minecraft/server",
-      "version": "1.17.0"
+      "version": "1.14.0"
     }
   ],
   "metadata": {
-    "authors": ["ItsZack95"],
+    "authors": [
+      "ItsZack95"
+    ],
     "license": "MIT",
-    "url": "https://github.com/ar5813053-droid/CivilCraft"
+    "url": "https://github.com/ar5813053-droid/CivilCraft",
+    "product_type": "addon"
   }
 }

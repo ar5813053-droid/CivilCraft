@@ -10,6 +10,7 @@
  */
 
 import { world, system } from "@minecraft/server";
+Logger_BOOT = true;
 import { Logger } from "./core/logger.js";
 import { loadWorldData, saveWorldData } from "./core/data-store.js";
 import { initializeJobs } from "./jobs/index.js";
@@ -100,64 +101,81 @@ import { getRelation } from "./nations/diplomacy.js";
 import { getShop, getAllShops } from "./economy/shops.js";
 import { getAllJobs } from "./jobs/job-registry.js";
 
-Logger.info("CivilCraft Player systems loading…");
+Logger.info("CivilCraft main.js loaded — registering runtime…");
 
-// --- Bootstrap ---
-loadWorldData();
-initializeJobs();
-initializeSchedules();
-initializeEconomy();
-initializeGovernment();
-initializeJustice();
-initializePolice();
-initializeEmergency();
-initializeHealthcare();
-initializeEducation();
-initializeSettlements();
-initializeInfrastructure();
-initializeHousing();
-initializePopulation();
-initializeDailyLife();
-initializeEmployment();
-initializeBusinessOperations();
-initializeBusinessProduction();
-initializeLogistics();
-initializeUtilities();
-initializeSocial();
-initializePolitics();
-initializeNations();
-initializeCivilization();
-initializeAppearance();
-  try { initializeVanillaAdoption(); } catch (e) { /* */ }
+function safeInit(name, fn) {
+  try {
+    fn();
+  } catch (e) {
+    Logger.error(`Init failed: ${name}`, e);
+  }
+}
 
+// Register chat FIRST so !cc ping works even if later systems fail
+// --- Bootstrap (fault-isolated) ---
+registerChatCommands();
+safeInit("loadWorldData", () => loadWorldData());
+safeInit("jobs", () => initializeJobs());
+safeInit("schedules", () => initializeSchedules());
+safeInit("economy", () => initializeEconomy());
+safeInit("government", () => initializeGovernment());
+safeInit("justice", () => initializeJustice());
+safeInit("police", () => initializePolice());
+safeInit("emergency", () => initializeEmergency());
+safeInit("healthcare", () => initializeHealthcare());
+safeInit("education", () => initializeEducation());
+safeInit("settlements", () => initializeSettlements());
+safeInit("infrastructure", () => initializeInfrastructure());
+safeInit("housing", () => initializeHousing());
+safeInit("population", () => initializePopulation());
+safeInit("dailyLife", () => initializeDailyLife());
+safeInit("employment", () => initializeEmployment());
+safeInit("businessOps", () => initializeBusinessOperations());
+safeInit("businessProduction", () => initializeBusinessProduction());
+safeInit("logistics", () => initializeLogistics());
+safeInit("utilities", () => initializeUtilities());
+safeInit("social", () => initializeSocial());
+safeInit("politics", () => initializePolitics());
+safeInit("nations", () => initializeNations());
+safeInit("civilization", () => initializeCivilization());
+safeInit("appearance", () => initializeAppearance());
+safeInit("vanillaAdoption", () => initializeVanillaAdoption());
+safeInit("capitalBlueprint", () => ensureCapitalBlueprint());
+safeInit("jobNavigation", () => initializeJobNavigation());
+safeInit("banking", () => initializeBanking());
+safeInit("player", () => initializePlayerSystem());
+safeInit("playerJobs", () => initializePlayerJobs());
+safeInit("memory", () => initializeMemory());
+safeInit("events", () => initializeEvents());
+safeInit("culture", () => initializeCulture());
+safeInit("ai", () => initializeAi());
+safeInit("citizenAi", () => initializeCitizenAi());
+safeInit("worldEvents", () => initializeWorldEvents());
+safeInit("reactions", () => wireCivilizationReactions());
+safeInit("simulation", () => startSimulation());
+
+try {
   world.afterEvents.playerSpawn.subscribe((ev) => {
-    if (!ev.initialSpawn) return;
     system.runTimeout(() => {
       try {
+        ev.player.sendMessage("§aCivilCraft loaded successfully. Type !cc ping");
         if (!isCapitalBuilt()) {
-          const loc = ev.player.location;
-          const r = startCapitalBuild(ev.player.dimension, loc);
+          const r = startCapitalBuild(ev.player.dimension, ev.player.location);
           if (r.ok) ev.player.sendMessage("§eCivilCraft is building the capital around you…");
+          else if (r.reason) ev.player.sendMessage(`§7Capital: ${r.reason}`);
         } else {
           ev.player.sendMessage("§7Welcome to CivilCraft capital.");
         }
-      } catch (e) { Logger.warn(`Capital spawn: ${e}`); }
+      } catch (e) {
+        Logger.warn(`Capital spawn: ${e}`);
+        try { ev.player.sendMessage("§cCivilCraft capital error — try !cc build capital"); } catch (_) {}
+      }
     }, 40);
   });
+} catch (e) {
+  Logger.error("playerSpawn subscribe failed", e);
+}
 
-  try { ensureCapitalBlueprint(); } catch (e) { /* */ }
-  try { initializeJobNavigation(); } catch (e) { /* */ }
-initializeBanking();
-initializePlayerSystem();
-initializePlayerJobs();
-initializeMemory();
-initializeEvents();
-initializeCulture();
-initializeAi();
-initializeCitizenAi();
-initializeWorldEvents();
-wireCivilizationReactions();
-startSimulation();
 
 // --- Entity lifecycle ---
 world.afterEvents.entitySpawn.subscribe((event) => {
@@ -180,20 +198,24 @@ system.beforeEvents?.shutdown?.subscribe?.(() => {
   saveWorldData();
 });
 
-// --- Development / debug commands ---
-// chatSend may be unavailable on some API versions; guard so the pack still loads.
-if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
-  world.beforeEvents.chatSend.subscribe((event) => {
-    const message = event.message.trim().toLowerCase();
-    if (!message.startsWith("!cc ")) return;
+// --- CivilCraft chat commands (ALWAYS registered; not DEBUG-gated) ---
+function handleCivilCraftCommand(player, rawMessage, event) {
+  const message = rawMessage.trim();
+  const lower = message.toLowerCase();
+  if (!lower.startsWith("!cc")) return false;
+  if (event && typeof event.cancel === "boolean") {
+    try { event.cancel = true; } catch (_) {}
+  }
+  const parts = message.slice(3).trim().split(/\s+/);
+  const cmd = (parts[0] || "help").toLowerCase();
+  const args = parts; // args[0] is cmd for compatibility with existing cases
 
-    event.cancel = true;
-    const player = event.sender;
-    const args = message.slice(4).split(/\s+/);
-    const cmd = args[0];
-
-    try {
-      switch (cmd) {
+  try {
+    if (cmd === "ping") {
+      player.sendMessage("§aCivilCraft runtime OK");
+      return true;
+    }
+    switch (cmd) {
         case "help":
           player.sendMessage(
             "§6CivilCraft:§r status manage population jobs village list save"
@@ -1128,11 +1150,49 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
       }
     } catch (e) {
       Logger.error("Command error", e);
-      player.sendMessage("§cCommand failed — check content log.");
+      try { player.sendMessage("§cCommand failed — check content log."); } catch (_) {}
     }
-  });
-} else if (DEBUG) {
-  Logger.warn("chatSend event unavailable — debug commands disabled.");
+  return true;
 }
+
+function registerChatCommands() {
+  let registered = false;
+  try {
+    if (world.beforeEvents && world.beforeEvents.chatSend) {
+      world.beforeEvents.chatSend.subscribe((event) => {
+        handleCivilCraftCommand(event.sender, event.message, event);
+      });
+      registered = true;
+      Logger.info("CivilCraft chatSend (beforeEvents) registered.");
+    }
+  } catch (e) {
+    Logger.warn(`beforeEvents.chatSend failed: ${e}`);
+  }
+  try {
+    if (!registered && world.afterEvents && world.afterEvents.chatSend) {
+      world.afterEvents.chatSend.subscribe((event) => {
+        handleCivilCraftCommand(event.sender, event.message, event);
+      });
+      registered = true;
+      Logger.info("CivilCraft chatSend (afterEvents) registered.");
+    }
+  } catch (e) {
+    Logger.warn(`afterEvents.chatSend failed: ${e}`);
+  }
+  if (!registered) {
+    Logger.error("CivilCraft: NO chat event available — commands will not work on this Bedrock build.");
+  }
+}
+
+// Startup banner + confirm script is alive
+system.runTimeout(() => {
+  try {
+    for (const p of world.getAllPlayers()) {
+      p.sendMessage("§aCivilCraft loaded successfully. Type !cc ping");
+    }
+  } catch (e) {
+    Logger.warn(`Startup banner: ${e}`);
+  }
+}, 60);
 
 Logger.info("CivilCraft Player systems ready.");

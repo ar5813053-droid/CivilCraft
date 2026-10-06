@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "dist"
 BP_UUID = "2a27c2cc-b7d6-4ac4-9637-95c770a6d3be"
 RP_UUID = "9296565a-743a-4368-9426-d469027a5956"
-VERSION = [1, 29, 0]
+VERSION = [1, 30, 0]
 
 
 def zip_dir(src, z, prefix=""):
@@ -42,6 +42,13 @@ def main():
         json.dumps([{"pack_id": BP_UUID, "version": VERSION}], indent=2)
     )
     (wd / "world_resource_packs.json").write_text(
+        json.dumps([{"pack_id": RP_UUID, "version": VERSION}], indent=2)
+    )
+    # History files help some clients treat packs as actively selected
+    (wd / "world_behavior_pack_history.json").write_text(
+        json.dumps([{"pack_id": BP_UUID, "version": VERSION}], indent=2)
+    )
+    (wd / "world_resource_pack_history.json").write_text(
         json.dumps([{"pack_id": RP_UUID, "version": VERSION}], indent=2)
     )
     with open(wd / "level.dat", "wb") as f:
