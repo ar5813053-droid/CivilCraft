@@ -87,6 +87,8 @@ import { listDefinitions } from "./worldevents/event-registry.js";
 import { wireCivilizationReactions } from "./civilization/reaction-engine.js";
 import { playerCastVote, playerJoinParty, playerLeaveParty, listElectionInfo } from "./politics/player-politics.js";
 import { runValidation } from "./core/validate.js";
+import { initializeVanillaAdoption } from "./villagers/vanilla-adoption.js";
+import { ensureCapitalBlueprint } from "./settlements/capital-bootstrap.js";
 import { getBalance } from "./economy/wallet.js";
 import { getAllShops } from "./economy/shops.js";
 import { selectAppearance } from "./civilization/appearance.js";
@@ -123,6 +125,8 @@ initializePolitics();
 initializeNations();
 initializeCivilization();
 initializeAppearance();
+  try { initializeVanillaAdoption(); } catch (e) { /* */ }
+  try { ensureCapitalBlueprint(); } catch (e) { /* */ }
 initializeBanking();
 initializePlayerSystem();
 initializePlayerJobs();

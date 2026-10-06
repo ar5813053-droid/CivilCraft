@@ -1,3 +1,14 @@
+# CivilCraft — Villager Civilization Addon
+
+**Creator:** ItsZack95  
+**Minecraft Bedrock:** 1.21+ / 1.26.x (26.52-compatible Script API)  
+**Version:** 1.29.0
+
+CivilCraft is an original Minecraft Bedrock civilization simulation addon. Living citizens work, trade, vote, celebrate festivals, and form a persistent society. The player is a real citizen — jobs, banking, elections, and festivals use the same systems as NPCs.
+
+
+---
+
 # CivilCraft
 
 **Deep, realistic Villager civilization simulation for Minecraft Bedrock Edition.**

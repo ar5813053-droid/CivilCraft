@@ -9,10 +9,7 @@
       "properties": {
         "civilcraft:role_index": {
           "type": "int",
-          "range": [
-            0,
-            31
-          ],
+          "range": [0, 87],
           "default": 0,
           "client_sync": true
         }

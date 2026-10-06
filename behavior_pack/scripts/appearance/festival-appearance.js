@@ -1,76 +1,184 @@
-/**
- * Festival appearance selection — priority above profession when participating.
- * Deterministic variants via hash(villagerId + festivalId + role).
- */
-
+/** Festival appearance matrix — full role × festival coverage. Deterministic. */
 import { hashId } from "../civilization/appearance.js";
 import { ROLE_APPEARANCE } from "../civilization/appearance.js";
 
-/** Keys must match resource-pack Texture.* names and ROLE_INDEX entries */
 export const FESTIVAL_APPEARANCE = Object.freeze({
-  christmas: {
-    civilian: "festival_christmas_civilian",
-    farmer: "festival_christmas_farmer",
-    worker: "festival_christmas_worker",
-    police_officer: "festival_christmas_police",
-    default: "festival_christmas_civilian"
-  },
-  diwali: {
-    civilian: "festival_diwali_civilian",
-    trader: "festival_diwali_trader",
-    farmer: "festival_diwali_farmer",
-    default: "festival_diwali_civilian"
-  },
-  holi: {
-    civilian: "festival_holi_civilian",
-    worker: "festival_holi_worker",
-    default: "festival_holi_civilian"
-  },
-  ramadan: {
-    civilian: "festival_ramadan_civilian",
-    teacher: "festival_ramadan_teacher",
-    default: "festival_ramadan_civilian"
-  },
-  eid: {
-    civilian: "festival_eid_civilian",
-    mayor: "festival_eid_festive",
-    default: "festival_eid_civilian"
-  }
+  christmas: Object.freeze({
+    "default": "festival_christmas_civilian",
+    "farmer": "festival_christmas_farmer",
+    "worker": "festival_christmas_worker",
+    "builder": "festival_christmas_builder",
+    "trader": "festival_christmas_trader",
+    "doctor": "festival_christmas_doctor",
+    "nurse": "festival_christmas_nurse",
+    "teacher": "festival_christmas_teacher",
+    "police_officer": "festival_christmas_police",
+    "police": "festival_christmas_police",
+    "emergency": "festival_christmas_emergency",
+    "mayor": "festival_christmas_mayor",
+    "leader": "festival_christmas_leader",
+    "soldier": "festival_christmas_soldier",
+    "student": "festival_christmas_student",
+    "civilian": "festival_christmas_civilian",
+  }),
+  diwali: Object.freeze({
+    "default": "festival_diwali_civilian",
+    "farmer": "festival_diwali_farmer",
+    "worker": "festival_diwali_worker",
+    "builder": "festival_diwali_builder",
+    "trader": "festival_diwali_trader",
+    "doctor": "festival_diwali_doctor",
+    "nurse": "festival_diwali_nurse",
+    "teacher": "festival_diwali_teacher",
+    "police_officer": "festival_diwali_police",
+    "police": "festival_diwali_police",
+    "emergency": "festival_diwali_emergency",
+    "mayor": "festival_diwali_mayor",
+    "leader": "festival_diwali_leader",
+    "soldier": "festival_diwali_soldier",
+    "student": "festival_diwali_student",
+    "civilian": "festival_diwali_civilian",
+  }),
+  holi: Object.freeze({
+    "default": "festival_holi_civilian",
+    "farmer": "festival_holi_farmer",
+    "worker": "festival_holi_worker",
+    "builder": "festival_holi_builder",
+    "trader": "festival_holi_trader",
+    "doctor": "festival_holi_doctor",
+    "nurse": "festival_holi_nurse",
+    "teacher": "festival_holi_teacher",
+    "police_officer": "festival_holi_police",
+    "police": "festival_holi_police",
+    "emergency": "festival_holi_emergency",
+    "mayor": "festival_holi_mayor",
+    "leader": "festival_holi_leader",
+    "soldier": "festival_holi_soldier",
+    "student": "festival_holi_student",
+    "civilian": "festival_holi_civilian",
+  }),
+  ramadan: Object.freeze({
+    "default": "festival_ramadan_civilian",
+    "farmer": "festival_ramadan_farmer",
+    "worker": "festival_ramadan_worker",
+    "builder": "festival_ramadan_builder",
+    "trader": "festival_ramadan_trader",
+    "doctor": "festival_ramadan_doctor",
+    "nurse": "festival_ramadan_nurse",
+    "teacher": "festival_ramadan_teacher",
+    "police_officer": "festival_ramadan_police",
+    "police": "festival_ramadan_police",
+    "emergency": "festival_ramadan_emergency",
+    "mayor": "festival_ramadan_mayor",
+    "leader": "festival_ramadan_leader",
+    "soldier": "festival_ramadan_soldier",
+    "student": "festival_ramadan_student",
+    "civilian": "festival_ramadan_civilian",
+  }),
+  eid: Object.freeze({
+    "default": "festival_eid_civilian",
+    "farmer": "festival_eid_farmer",
+    "worker": "festival_eid_worker",
+    "builder": "festival_eid_builder",
+    "trader": "festival_eid_trader",
+    "doctor": "festival_eid_doctor",
+    "nurse": "festival_eid_nurse",
+    "teacher": "festival_eid_teacher",
+    "police_officer": "festival_eid_police",
+    "police": "festival_eid_police",
+    "emergency": "festival_eid_emergency",
+    "mayor": "festival_eid_mayor",
+    "leader": "festival_eid_leader",
+    "soldier": "festival_eid_soldier",
+    "student": "festival_eid_student",
+    "civilian": "festival_eid_civilian",
+  }),
 });
 
 export const FESTIVAL_ROLE_INDEX = Object.freeze({
-  festival_christmas_civilian: 18,
-  festival_christmas_farmer: 19,
-  festival_christmas_worker: 20,
-  festival_christmas_police: 21,
-  festival_diwali_civilian: 22,
-  festival_diwali_trader: 23,
-  festival_diwali_farmer: 24,
-  festival_holi_civilian: 25,
-  festival_holi_worker: 26,
-  festival_ramadan_civilian: 27,
-  festival_ramadan_teacher: 28,
-  festival_eid_civilian: 29,
-  festival_eid_festive: 30
+  "festival_christmas_farmer": 18,
+  "festival_christmas_worker": 19,
+  "festival_christmas_builder": 20,
+  "festival_christmas_trader": 21,
+  "festival_christmas_doctor": 22,
+  "festival_christmas_nurse": 23,
+  "festival_christmas_teacher": 24,
+  "festival_christmas_police": 25,
+  "festival_christmas_emergency": 26,
+  "festival_christmas_mayor": 27,
+  "festival_christmas_leader": 28,
+  "festival_christmas_soldier": 29,
+  "festival_christmas_student": 30,
+  "festival_christmas_civilian": 31,
+  "festival_diwali_farmer": 32,
+  "festival_diwali_worker": 33,
+  "festival_diwali_builder": 34,
+  "festival_diwali_trader": 35,
+  "festival_diwali_doctor": 36,
+  "festival_diwali_nurse": 37,
+  "festival_diwali_teacher": 38,
+  "festival_diwali_police": 39,
+  "festival_diwali_emergency": 40,
+  "festival_diwali_mayor": 41,
+  "festival_diwali_leader": 42,
+  "festival_diwali_soldier": 43,
+  "festival_diwali_student": 44,
+  "festival_diwali_civilian": 45,
+  "festival_holi_farmer": 46,
+  "festival_holi_worker": 47,
+  "festival_holi_builder": 48,
+  "festival_holi_trader": 49,
+  "festival_holi_doctor": 50,
+  "festival_holi_nurse": 51,
+  "festival_holi_teacher": 52,
+  "festival_holi_police": 53,
+  "festival_holi_emergency": 54,
+  "festival_holi_mayor": 55,
+  "festival_holi_leader": 56,
+  "festival_holi_soldier": 57,
+  "festival_holi_student": 58,
+  "festival_holi_civilian": 59,
+  "festival_ramadan_farmer": 60,
+  "festival_ramadan_worker": 61,
+  "festival_ramadan_builder": 62,
+  "festival_ramadan_trader": 63,
+  "festival_ramadan_doctor": 64,
+  "festival_ramadan_nurse": 65,
+  "festival_ramadan_teacher": 66,
+  "festival_ramadan_police": 67,
+  "festival_ramadan_emergency": 68,
+  "festival_ramadan_mayor": 69,
+  "festival_ramadan_leader": 70,
+  "festival_ramadan_soldier": 71,
+  "festival_ramadan_student": 72,
+  "festival_ramadan_civilian": 73,
+  "festival_eid_farmer": 74,
+  "festival_eid_worker": 75,
+  "festival_eid_builder": 76,
+  "festival_eid_trader": 77,
+  "festival_eid_doctor": 78,
+  "festival_eid_nurse": 79,
+  "festival_eid_teacher": 80,
+  "festival_eid_police": 81,
+  "festival_eid_emergency": 82,
+  "festival_eid_mayor": 83,
+  "festival_eid_leader": 84,
+  "festival_eid_soldier": 85,
+  "festival_eid_student": 86,
+  "festival_eid_civilian": 87,
 });
 
-/**
- * @param {string} festivalId
- * @param {string} jobId
- * @param {string} villagerId
- * @returns {string} appearance key
- */
 export function selectFestivalAppearance(festivalId, jobId, villagerId) {
   const map = FESTIVAL_APPEARANCE[festivalId];
   if (!map) return null;
   if (jobId && map[jobId]) return map[jobId];
-  // profession-preserving fallback where map has role
-  const roleKey = ROLE_APPEARANCE[jobId];
-  if (roleKey && map[jobId]) return map[jobId];
-  // deterministic civilian variant within festival
-  const variants = Object.values(map).filter((v) => v !== map.default);
+  // map common aliases
+  const aliases = { police_officer: "police", shopkeeper: "trader", merchant: "trader", construction: "builder" };
+  const alias = aliases[jobId];
+  if (alias && map[alias]) return map[alias];
+  const variants = Object.values(map).filter((v, i, a) => a.indexOf(v) === i);
   if (variants.length) {
-    return variants[hashId(`${villagerId}:${festivalId}`) % variants.length];
+    return variants[hashId(`${villagerId}:${festivalId}:${jobId || "x"}`) % variants.length];
   }
-  return map.default;
+  return map.default || null;
 }

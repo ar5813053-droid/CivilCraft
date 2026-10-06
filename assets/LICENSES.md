@@ -45,3 +45,11 @@ CivilCraft does **not** bundle third-party festival packs that prohibit redistri
 | Christmas | xmas-chests-mcbe (optional) | TheAlienDoctor | CC0-1.0 | **No** (user may install RP) | Optional; CivilCraft native always works |
 
 Sources researched 2026-10-06. If redistribution rights change, update this table before bundling any assets.
+
+
+## Branding
+
+| Asset | Source | Creator | License |
+|-------|--------|---------|---------|
+| `pack_icon.png` (BP/RP) | Official CivilCraft logo | ItsZack95 | Project MIT / original artwork provided for CivilCraft |
+| Festival role textures | Generated tints of CivilCraft role placeholders | CivilCraft / ItsZack95 | MIT original |
