@@ -356,3 +356,19 @@ CivilCraft is an integrated Bedrock civilization simulation: citizens, economy, 
 Primary commands: `!cc status`, `!cc calendar`, `!cc validate`, `!cc jobs`, `!cc bank`, `!cc election`, `!cc festivals`.
 
 Target: Minecraft Bedrock with `@minecraft/server` stable APIs. Runtime validation must be performed in-game.
+
+
+## Download / Play (Android & Bedrock)
+
+1. **Recommended:** Download `CivilCraft.mcaddon` from the latest GitHub Actions artifact or Release, open it on your device to install BP+RP.
+2. Create a new **Flat** or normal world with **Beta APIs / Script** experiments if your version requires them for `@minecraft/server`.
+3. Enable **CivilCraft** Behavior Pack and Resource Pack on the world.
+4. Enter the world. On first spawn the capital starts building, or run:
+   ```
+   !cc build capital
+   ```
+5. Commands: `!cc validate` · `!cc calendar` · `!cc jobs` · `!cc bank` · `!cc election` · `!cc festivals` · `!cc court`
+
+`CivilCraft-Complete.mcworld` embeds both packs. **Note:** a fully pre-baked LevelDB terrain database cannot be generated without Minecraft itself; the capital is constructed in-game by CivilCraft scripts (real blocks).
+
+Creator: **ItsZack95** · Version **1.29.0**

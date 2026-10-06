@@ -1,0 +1,54 @@
+name: Package CivilCraft Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate structure
+        run: node tests/validate-structure.js
+      - name: Texture refs
+        run: node tests/resources/texture-refs.test.js
+      - name: Key regression tests
+        run: |
+          node tests/economy/wallet.test.js
+          node tests/employment/employment.test.js
+          node tests/politics/politics.test.js
+          node tests/culture/fixed-calendar.test.js
+          node tests/festivals/appearance.test.js
+      - name: Package
+        run: python3 tools/package_release.py
+      - name: Verify package
+        run: |
+          python3 - <<'PY'
+          import zipfile, json
+          from pathlib import Path
+          mw = Path("dist/CivilCraft-Complete.mcworld")
+          assert mw.exists() and mw.stat().st_size > 10000
+          with zipfile.ZipFile(mw) as z:
+            names = z.namelist()
+            assert any("world_behavior_packs.json" in n for n in names)
+            assert any("behavior_packs/" in n for n in names)
+            assert any("resource_packs/" in n for n in names)
+          print("Package OK", mw.stat().st_size)
+          PY
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CivilCraft-Release
+          path: |
+            dist/CivilCraft-Complete.mcworld
+            dist/CivilCraft.mcaddon
+            dist/CivilCraft-BP.mcpack
+            dist/CivilCraft-RP.mcpack

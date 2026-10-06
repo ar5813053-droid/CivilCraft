@@ -89,6 +89,9 @@ import { playerCastVote, playerJoinParty, playerLeaveParty, listElectionInfo } f
 import { runValidation } from "./core/validate.js";
 import { initializeVanillaAdoption } from "./villagers/vanilla-adoption.js";
 import { ensureCapitalBlueprint } from "./settlements/capital-bootstrap.js";
+import { startCapitalBuild, isCapitalBuilt, getFacility } from "./worldgen/capital-builder.js";
+import { initializeJobNavigation } from "./jobs/job-navigation.js";
+import { openCourtSession, deliverVerdict, listOpenCourtCases } from "./justice/court-session.js";
 import { getBalance } from "./economy/wallet.js";
 import { getAllShops } from "./economy/shops.js";
 import { selectAppearance } from "./civilization/appearance.js";
@@ -126,7 +129,24 @@ initializeNations();
 initializeCivilization();
 initializeAppearance();
   try { initializeVanillaAdoption(); } catch (e) { /* */ }
+
+  world.afterEvents.playerSpawn.subscribe((ev) => {
+    if (!ev.initialSpawn) return;
+    system.runTimeout(() => {
+      try {
+        if (!isCapitalBuilt()) {
+          const loc = ev.player.location;
+          const r = startCapitalBuild(ev.player.dimension, loc);
+          if (r.ok) ev.player.sendMessage("§eCivilCraft is building the capital around you…");
+        } else {
+          ev.player.sendMessage("§7Welcome to CivilCraft capital.");
+        }
+      } catch (e) { Logger.warn(`Capital spawn: ${e}`); }
+    }, 40);
+  });
+
   try { ensureCapitalBlueprint(); } catch (e) { /* */ }
+  try { initializeJobNavigation(); } catch (e) { /* */ }
 initializeBanking();
 initializePlayerSystem();
 initializePlayerJobs();
@@ -840,6 +860,26 @@ if (DEBUG && world.beforeEvents && world.beforeEvents.chatSend) {
           player.sendMessage("§7Housing via !cc population / existing housing records");
           break;
 
+        case "build": {
+          if ((args[1] || "").toLowerCase() === "capital") {
+            const r = startCapitalBuild(player.dimension, player.location);
+            player.sendMessage(r.ok ? `§aBuilding capital (${r.jobs} stages)…` : `§c${r.reason || "failed"}`);
+          } else player.sendMessage("§e!cc build capital");
+          break;
+        }
+        case "court": {
+          const sub = (args[1] || "list").toLowerCase();
+          if (sub === "list") {
+            for (const c of listOpenCourtCases()) player.sendMessage(`${c.id} ${c.status}`);
+          } else if (sub === "open") {
+            const r = openCourtSession(args[2]);
+            player.sendMessage(r.ok ? "§aCourt opened" : `§c${r.error}`);
+          } else if (sub === "verdict") {
+            const r = deliverVerdict(args[2], args[3]);
+            player.sendMessage(r.ok ? `§aVerdict ${args[3]}` : `§c${r.error}`);
+          } else player.sendMessage("§e!cc court list|open <id>|verdict <id> guilty|not_guilty");
+          break;
+        }
         case "validate": {
           const report = runValidation();
           player.sendMessage(`§6Validation: ${report.status}`);
