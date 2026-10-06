@@ -79,6 +79,7 @@ import { initializePlayerJobs, listAvailableJobs, listNearbyEmployers, applyForJ
 import { initializeMemory, listCivilizationMemories } from "./memory/memory-manager.js";
 import { initializeEvents, getEventsStore, scheduleEvent } from "./events/event-manager.js";
 import { initializeCulture, getCultureStore, listActiveFestivals, listUpcomingFestivals, playerJoinFestival, playerLeaveFestival, cancelFestival, cultureStats, listFestivals, getFestival } from "./culture/culture-manager.js";
+import { listAllAddonStatuses, getAddonStatus, setAddonEnabled } from "./culture/integrations/festival-addon-adapter.js";
 import { initializeAi, getAiStore } from "./ai/behavior-engine.js";
 import { initializeCitizenAi } from "./citizenai/citizen-ai-manager.js";
 import { initializeWorldEvents, getWorldEventsStore, listActiveEvents, listUpcoming, getEventInfo, playerJoinEvent, playerLeaveEvent, calendarLines, scheduleManual, cancelEvent } from "./worldevents/world-event-manager.js";

@@ -21,6 +21,7 @@ import { reportEvent } from "../social/media.js";
 import { createDecorationStore, planDecorations, placeDecorationBatch, cleanupFestivalDecorations } from "./festival-decorations.js";
 import { generateFestivalMissions } from "./festival-missions.js";
 import { publish as busPublish } from "../events/event-bus.js";
+import { onFestivalPhase } from "./integrations/festival-addon-lifecycle.js";
 
 let initialized = false;
 export const CULTURE_INTERVAL = 1200;
@@ -118,6 +119,7 @@ function tickCulture(data) {
 
     if (track.status === "scheduled" && phaseDay >= 0) {
       track.status = "preparation";
+      try { onFestivalPhase(fest.id, "preparation", { trackId: track.id }); } catch { /* */ }
       publish("FESTIVAL_PREPARATION_STARTED", {
         source: "culture",
         metadata: { festivalId: fest.id, trackId: track.id }
@@ -146,6 +148,7 @@ function tickCulture(data) {
         if (!data.culture.decorations) data.culture.decorations = createDecorationStore();
         placeDecorationBatch(data.culture.decorations, planned);
         busPublish("FESTIVAL_VISUALS_STARTED", { source: "culture", metadata: { festivalId: fest.id } });
+        try { onFestivalPhase(fest.id, "active", { trackId: track.id }); } catch { /* */ }
       } catch (e) { Logger.warn(`Festival visuals: ${e}`); }
       publish("FESTIVAL_STARTED", {
         source: "culture",
@@ -273,6 +276,7 @@ function completeFestival(store, data, track, fest, day) {
     if (data.culture.decorations) {
       cleanupFestivalDecorations(data.culture.decorations, fest.id);
       busPublish("FESTIVAL_VISUALS_CLEARED", { source: "culture", metadata: { festivalId: fest.id } });
+      try { onFestivalPhase(fest.id, "completed", { trackId: track.id }); } catch { /* */ }
     }
     generateFestivalMissions(data, fest, track, "cleanup");
   } catch (e) { Logger.warn(`Festival cleanup: ${e}`); }

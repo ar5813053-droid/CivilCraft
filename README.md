@@ -331,3 +331,9 @@ Christmas, Diwali, Holi, Ramadan, Eid + harvest. Culture schedules via world cal
 ## Milestone 4.5 — Festival Visuals
 
 Festival appearance (role_index 18–30), profession-preserving outfits, safe decoration place/cleanup, real festival missions. Schema **28**. Texture placeholders derived from original CivilCraft role art.
+
+## Optional festival add-ons
+
+CivilCraft does **not** ship third-party festival packs that forbid redistribution.
+Use `!cc festival addons list` to see integration status. Missing external packs → CivilCraft fallback visuals.
+See `docs/festival-addons.md` and `assets/LICENSES.md`.

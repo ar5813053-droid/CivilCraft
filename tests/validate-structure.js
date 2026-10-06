@@ -146,6 +146,10 @@ const required = [
   "behavior_pack/scripts/culture/festival-missions.js",
   "behavior_pack/scripts/culture/festival-decorations.js",
   "behavior_pack/scripts/appearance/festival-appearance.js",
+  "behavior_pack/scripts/culture/integrations/festival-addon-lifecycle.js",
+  "behavior_pack/scripts/culture/integrations/festival-addon-adapter.js",
+  "behavior_pack/scripts/culture/integrations/festival-addon-capabilities.js",
+  "behavior_pack/scripts/culture/integrations/festival-addon-registry.js",
 
   "behavior_pack/scripts/culture/festival-manager.js",
   "behavior_pack/scripts/ai/personality-data.js",

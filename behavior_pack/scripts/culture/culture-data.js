@@ -11,6 +11,7 @@ export function createDefaultCulture() {
     cooldowns: {},
     impact: {},
     decorations: { records: [], cursor: 0 },
+    addonEnabled: { holi: true, diwali: true, ramadan: true, eid: true, christmas: true },
     stats: {
       festivalsHeld: 0,
       totalAttendance: 0,
@@ -32,6 +33,7 @@ export function normalizeCulture(raw) {
     cooldowns: raw.cooldowns && typeof raw.cooldowns === "object" ? raw.cooldowns : {},
     impact: raw.impact && typeof raw.impact === "object" ? raw.impact : {},
     decorations: raw.decorations && typeof raw.decorations === "object" ? raw.decorations : { records: [], cursor: 0 },
+    addonEnabled: raw.addonEnabled && typeof raw.addonEnabled === "object" ? raw.addonEnabled : { holi: true, diwali: true, ramadan: true, eid: true, christmas: true },
     stats: { ...base.stats, ...(raw.stats || {}) }
   };
 }

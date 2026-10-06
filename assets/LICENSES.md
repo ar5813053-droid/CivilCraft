@@ -30,3 +30,18 @@ Role PNGs remain original solid-color markers (32×32). Geometry uses Bedrock bu
 ## Festival textures (Milestone 4.5)
 
 Festival role textures (`festival_*.png`) are derived from original CivilCraft role textures (procedural/recolored placeholders). License: same as project (MIT / original CivilCraft assets). Not Marketplace content.
+
+
+## External festival add-on integrations (optional)
+
+CivilCraft does **not** bundle third-party festival packs that prohibit redistribution.
+
+| Festival | External pack | Creator | License / terms | Bundled? | Integration |
+|----------|---------------|---------|-----------------|----------|-------------|
+| Holi | Holi Festival+ | Racing Raftaar | Free use; **no republish/repost** | **No** | Optional external; detect if user installs |
+| Diwali | Marketplace / third-party | e.g. Entity Builds | Proprietary Marketplace | **No** | Optional external only |
+| Ramadan | — | — | — | No | CivilCraft native fallback |
+| Eid | — | — | — | No | CivilCraft native fallback |
+| Christmas | xmas-chests-mcbe (optional) | TheAlienDoctor | CC0-1.0 | **No** (user may install RP) | Optional; CivilCraft native always works |
+
+Sources researched 2026-10-06. If redistribution rights change, update this table before bundling any assets.
